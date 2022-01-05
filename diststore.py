@@ -1,13 +1,11 @@
 import plyvel
 import os
-import hashlib
-from util import get_db_size
-
+from util import get_db_size, hashed_key
 
 class DistStore():
     def __init__(self):
         self.stores = {}
-        self.workers = []
+        self.workers = {}
         self.content_idx = 0
         self.worker_idx = 0
         self.master = None
@@ -16,62 +14,59 @@ class DistStore():
         self.master = plyvel.DB('/tmp/cachedb/master', create_if_missing=True)
         return self.master
     
+    def k_in_master(self, idx):
+        for k, _ in self.master:
+            print('k...', k)
+            if k == idx:
+                return True
+        return False
+    
     def print_master(self):
         for k, v in self.master:
             print(k, v)
-     
-    def clear_and_close(self):
+    def clear_master(self):
         for k, _ in self.master:
             self.master.delete(k)
+        self.masters.close()
 
-        # ik this is ugly but it works enough
+    def clear_workers(self):
         for worker in self.workers:
             for k, _ in worker:
                 worker.delete(k)
             worker.close()
             del worker
 
-        self.master.close()
-        del self.master
 
     # call this after we reach a certain amount of data hit
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
-        self.workers.append(db)
+        print(hashed_key(self.worker_idx +1 ))
+        self.workers[str(hashed_key(self.worker_idx+1)).encode()] = db
         self.worker_idx += 1
+        return db
     
-    # adds current child to master
-    def add_worker_to_master(self):
-        db = self.workers[self.worker_idx-1]
-        print('DB:', db) # checks if the worker db is correct.
-        k = str(self.worker_idx-1).encode()
-        hasher = hashlib.new('sha512_256')
-        hasher.update(k)
-        hashed_k = hasher.hexdigest()
-        self.master.put(str(hashed_k).encode(), str(db).encode())
+    # adds child to master
+    def add_worker_to_master(self, hashed_idx, db_size):
+        print('DB:', hashed_idx) # checks if the worker db is correct.
+        self.master.put(hashed_idx, db_size)
+        print('added new woker to master!!!')
 
     def put(self, val):
-        db = self.workers[self.worker_idx-1]
+        hashed_k = str(hashed_key(self.worker_idx)).encode()
+        db = self.workers[hashed_k]
         print(db, self.worker_idx-1, self.content_idx)
-        k = str(self.worker_idx-1).encode()
-        hasher = hashlib.new('sha512_256')
-        hasher.update(k)
-        hashed_k = hasher.hexdigest()
-        db.put(str(hashed_k).encode(), str(val).encode())
+        db.put(hashed_k, str(val).encode())
         self.content_idx +=1
-        path = f'/tmp/cachedb/worker/{self.worker_idx-1}'
-        print(get_db_size(path)) # use this later to determine where
+        #path = f'/tmp/cachedb/worker/{self.worker_idx-1}'
+        print(get_db_size(self.worker_idx)) # use this later to determine where
         # to split data into how many chunks
         return val
 
     def get(self, key):
-        db = self.workers[self.worker_idx-1]
-        k = str(self.worker_idx-1).encode()
-        hasher = hashlib.new('sha512_256')
-        hasher.update(k)
-        hashed_k = hasher.hexdigest()
-        return db.get(str(hashed_k).encode())
+        hashed_k = str(hashed_key(self.worker_idx)).encode()
+        db = self.workers[hashed_k]
+        return db.get(hashed_k)
     
     def gets(self):
         ret = []

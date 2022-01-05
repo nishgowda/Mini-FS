@@ -4,6 +4,7 @@ from diststore import DistStore
 from flask import Flask
 from flask import jsonify
 import json
+from util import get_db_size
 
 app = Flask(__name__)
 dstore = DistStore()
@@ -11,8 +12,12 @@ dstore = DistStore()
 @app.route('/master')
 def create_master():
     ret = dstore.create_master()
-    dstore.add_worker()
     return jsonify(str(ret))
+
+@app.route('/worker/')
+def create_worker():
+    dstore.add_worker()
+
 
 @app.route('/put/<val>')
 def put_req(val):

@@ -1,5 +1,7 @@
 import os
-def get_db_size(db_dir):
+import hashlib
+def get_db_size(worker_idx):
+    db_dir =  f'/tmp/cachedb/worker/{worker_idx-1}'
     size = 0
     for f in os.listdir(db_dir):
         path = os.path.join(db_dir, f)
@@ -7,3 +9,9 @@ def get_db_size(db_dir):
             size += os.path.getsize(path)
     return size
 
+def hashed_key(worker_idx):
+    k = str(worker_idx-1).encode()
+    hasher = hashlib.new('sha512_256')
+    hasher.update(k)
+    hashed_k = hasher.hexdigest()
+    return hashed_k
