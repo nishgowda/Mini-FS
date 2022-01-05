@@ -9,8 +9,8 @@ def get_db_size(worker_idx):
             size += os.path.getsize(path)
     return size
 
-def hashed_key(worker_idx):
-    k = str(worker_idx-1).encode()
+def hashed_key(key):
+    k = str(key).encode()
     hasher = hashlib.new('sha512_256')
     hasher.update(k)
     hashed_k = hasher.hexdigest()

@@ -19,9 +19,9 @@ def create_worker(worker_idx):
     return jsonify(str(worker))
 
 
-@app.route('/put/<val>')
-def put_req(val):
-    ret = dstore.put(val)
+@app.route('/put/<key>/<val>')
+def put_req(key, val):
+    ret = dstore.put(key, val)
     # make the payload here
     payload = {
             'key': str(hashed_key(dstore.worker_idx)),
@@ -33,7 +33,7 @@ def put_req(val):
 
 @app.route('/get/<key>')
 def get_req(key):
-    ret = dstore.get(int(key))
+    ret = dstore.get(key)
     return jsonify(str(ret.decode('utf-8')))
 
 @app.route('/clear')

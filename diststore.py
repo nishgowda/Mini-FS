@@ -44,8 +44,8 @@ class DistStore():
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
-        print(hashed_key(self.worker_idx +1 ))
-        self.workers[str(hashed_key(self.worker_idx+1)).encode()] = db
+        print(hashed_key(self.worker_idx-1))
+        self.workers[str(hashed_key(self.worker_idx -1)).encode()] = db
         self.worker_idx += 1
         return db
     
@@ -55,9 +55,10 @@ class DistStore():
         self.master.put(hashed_idx, db_size)
         print('added new woker to master!!!')
 
-    def put(self, val):
-        hashed_k = str(hashed_key(self.worker_idx)).encode()
-        db = self.workers[hashed_k]
+    def put(self,key,val):
+        hashed_k = str(hashed_key(key)).encode()
+        hashed_worker_idx = str(hashed_key(self.worker_idx -2)).encode()
+        db = self.workers[hashed_worker_idx]
         print(db, self.worker_idx-1, self.content_idx)
         db.put(hashed_k, str(val).encode())
         self.content_idx +=1
@@ -67,8 +68,8 @@ class DistStore():
         return val
 
     def get(self, key):
-        hashed_k = str(hashed_key(self.worker_idx)).encode()
+        hashed_k = str(hashed_key(self.worker_idx-2)).encode()
         db = self.workers[hashed_k]
-        return db.get(hashed_k)
+        return db.get(str(hashed_key(key)).encode())
     
         

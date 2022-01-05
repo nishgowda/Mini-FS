@@ -8,25 +8,36 @@ A master is created that will hold metadata about each worker node that is creat
 
 
 ### API
+Master
+```
+/master
 
-#### MASTER
-```
-Use /master to create the master server
-```
+run ./master.py on terminal to spin up the master server. 
 
-#### WORKER
+Then make a request to /master to connect it to the server db 
 ```
-Use /worker/<worker_idx> to create a new worker server with worker_idx
+Worker
 ```
+/worker
 
-#### PUT
+run ./worker.py <port_number>  on terminal to start a worker server running on port_number. 
+
+Make a request to /worker/<worker_idx> to create a new worker server with worker_idx.
+This adds the worker to the master server if the worker has not already been added.
+
 ```
-Use the /PUT route to store some value. Key is auto-incremented and hashed.
+Put
 ```
-#### GET
+/put/<key>/<val>
+
+make a request to /put/<key><val> on the worker server to store some value.  The value is kept by the certain worker you make the request to. 
 ```
-Use the /GET route to get the value for a given key.
+Get
 ```
+/get/<key>/
+
+make a request to /get/<key> to recieve the value for the given key.
+``
 
 ### Start the server
 *Note:* You must always start the master server before adding any key/value storage.
