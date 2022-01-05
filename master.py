@@ -24,6 +24,7 @@ def add_worker():
         if not dstore.k_in_master(key.encode()):
             dstore.add_worker_to_master(key.encode(), db_size)
         return jsonify("Added worker: ", key)
+
 @app.route('/clear')
 def clear():
     dstore.clear_master()

@@ -10,6 +10,9 @@ class DistStore():
         self.worker_idx = 0
         self.master = None
     
+    def set_worker_idx(self, idx):
+        self.worker_idx = idx
+
     def create_master(self):
         self.master = plyvel.DB('/tmp/cachedb/master', create_if_missing=True)
         return self.master
@@ -24,6 +27,7 @@ class DistStore():
     def print_master(self):
         for k, v in self.master:
             print(k, v)
+    
     def clear_master(self):
         for k, _ in self.master:
             self.master.delete(k)
@@ -35,7 +39,6 @@ class DistStore():
                 worker.delete(k)
             worker.close()
             del worker
-
 
     # call this after we reach a certain amount of data hit
     def add_worker(self):
@@ -68,10 +71,4 @@ class DistStore():
         db = self.workers[hashed_k]
         return db.get(hashed_k)
     
-    def gets(self):
-        ret = []
-        for worker in self.workers:
-            for _, v in worker:
-                ret.append(v)
-        return ret
         

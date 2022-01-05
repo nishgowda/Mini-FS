@@ -10,8 +10,9 @@ import requests
 
 app = Flask(__name__)
 
-@app.route('/worker')
-def create_worker():
+@app.route('/worker/<worker_idx>')
+def create_worker(worker_idx):
+    dstore.set_worker_idx(int(worker_idx))
     worker = dstore.add_worker()
     #dstore.add_worker_to_master()
     print('DSTORE', dstore, 'worker:', worker)

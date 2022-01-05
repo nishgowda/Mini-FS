@@ -1,5 +1,5 @@
 #!/bin/bash
-for i in {0..5}
-do
-	curl --X http://localhost:5000/put/'dasdasd'
-done
+
+curl --X http://localhost:5000/master
+curl --X http://localhost:5001/worker
+curl --X http://localhost:5001/put/'dsadsdas'

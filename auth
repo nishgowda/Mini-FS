@@ -1,0 +1,5 @@
+#!/bin/bash
+
+token=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
+
+git remote set-url origin https://$token@github.com/nishgowda/diststore.git 
