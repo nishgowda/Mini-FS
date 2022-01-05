@@ -37,7 +37,7 @@ Get
 /get/<key>/
 
 make a request to /get/<key> to recieve the value for the given key.
-``
+```
 
 ### Start the server
 *Note:* You must always start the master server before adding any key/value storage.
