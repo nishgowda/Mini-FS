@@ -57,11 +57,11 @@ class DistStore():
         hashed_k = str(hashed_key(key)).encode()
         hashed_worker_idx = str(hashed_key(self.worker_idx -2)).encode()
         db = self.workers[hashed_worker_idx] 
-        db.put(hashed_k, str(val).encode())
+        db.put(hashed_k, val.encode())
         self.content_idx +=1
         return val
 
     def get(self, key):
         hashed_k = str(hashed_key(self.worker_idx-2)).encode()
         db = self.workers[hashed_k]
-        return db.get(str(hashed_key(key)).encode())        
+        return db.get(str(hashed_key(key)).encode())     
