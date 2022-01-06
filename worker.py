@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 from master import dstore
-from flask import Flask
-from flask import jsonify
+from flask import Flask, jsonify, send_from_directory
 import json
-from util import get_db_size, hashed_key
+from util import get_db_size, hashed_key, allowed_file
 import sys
 import requests
-
+import io
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = '~/code/diststore/'
 
 @app.route('/worker/<worker_idx>')
 def create_worker(worker_idx):
@@ -21,7 +21,16 @@ def create_worker(worker_idx):
 
 @app.route('/put/<key>/<val>')
 def put_req(key, val):
-    ret = dstore.put(key, val)
+    if allowed_file(val):
+        print('dasda?')
+        full_file = val
+        with open(full_file) as f:
+            ret = dstore.put(key, f)
+            ret = str(ret)
+            print('RET:', ret)
+            f.close()
+    else:
+        ret = dstore.put(key, val)
     # make the payload here
     payload = {
             'key': str(hashed_key(dstore.worker_idx)),
@@ -40,6 +49,7 @@ def get_req(key):
 def clear():
     dstore.clear_workers()
     return jsonify("Cleared workers...clear server if you havent")
+
 
 if __name__ == "__main__":
     port = sys.argv[1]

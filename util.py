@@ -15,3 +15,9 @@ def hashed_key(key):
     hasher.update(k)
     hashed_k = hasher.hexdigest()
     return hashed_k
+
+# straight from: https://flask.palletsprojects.com/en/2.0.x/patterns/fileuploads/
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
