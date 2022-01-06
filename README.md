@@ -43,8 +43,8 @@ make a request to /get/<key> to recieve the value for the given key.
 *Note:* You must always start the master server before adding any key/value storage.
 
 - Run `./master.py` and `./worker.py <port_number>` seperately. 
-- Call the `/master` and `/worker` urls for the master and worker servers respectively. This creates connections to the dbs
+- Run ./start-master and ./test <worker_idx> <content_id>.
 - Then you can make requests to the worker server by placing put and get requests to it.
-- For each new worker you make, the master server will add metadata about it to it's content
+- For each new worker you make, the master server will add metadata about it to it's content.
 
-#### Also curl the *clear* url when finished to clear master and worker server so you can keep runnning the tests without overlapping the data.
+#### Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.

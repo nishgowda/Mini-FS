@@ -33,13 +33,10 @@ class DistStore():
             self.master.delete(k)
         self.masters.close()
 
-    def clear_workers(self):
-        for worker in self.workers:
-            for k, _ in worker:
-                worker.delete(k)
-            worker.close()
-            del worker
-
+    def clear_worker(self):
+        worker = list(self.workers.values())[0]
+        for k, _ in worker:
+            worker.delete(k)
     # call this after we reach a certain amount of data hit
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'

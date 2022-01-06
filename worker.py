@@ -23,12 +23,10 @@ def create_worker(worker_idx):
 def put_req(key, val):
     if allowed_file(val):
         print('dasda?')
-        full_file = val
-        with open(full_file) as f:
-            ret = dstore.put(key, f)
-            ret = str(ret)
-            print('RET:', ret)
-            f.close()
+        infile = open(val, 'rb')
+        data = infile.read()
+        dstore.put(key, data)
+        ret = 'Saved ' + val
     else:
         ret = dstore.put(key, val)
     # make the payload here
@@ -47,7 +45,7 @@ def get_req(key):
 
 @app.route('/clear')
 def clear():
-    dstore.clear_workers()
+    dstore.clear_worker()
     return jsonify("Cleared workers...clear server if you havent")
 
 
