@@ -31,7 +31,7 @@ class DistStore():
     def clear_master(self):
         for k, _ in self.master:
             self.master.delete(k)
-        self.masters.close()
+        #self.masters.close()
 
     def clear_worker(self):
         worker = list(self.workers.values())[0]
@@ -41,7 +41,7 @@ class DistStore():
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
-        print(hashed_key(self.worker_idx-1))
+        #print(hashed_key(self.worker_idx-1))
         self.workers[str(hashed_key(self.worker_idx -1)).encode()] = db
         self.worker_idx += 1
         return db
@@ -56,17 +56,12 @@ class DistStore():
         hashed_k = str(hashed_key(key)).encode()
         hashed_worker_idx = str(hashed_key(self.worker_idx -2)).encode()
         db = self.workers[hashed_worker_idx]
-        print(db, self.worker_idx-1, self.content_idx)
+        #print(db, self.worker_idx-1, self.content_idx)
         db.put(hashed_k, str(val).encode())
         self.content_idx +=1
-        #path = f'/tmp/cachedb/worker/{self.worker_idx-1}'
-        print(get_db_size(self.worker_idx)) # use this later to determine where
-        # to split data into how many chunks
         return val
 
     def get(self, key):
         hashed_k = str(hashed_key(self.worker_idx-2)).encode()
         db = self.workers[hashed_k]
-        return db.get(str(hashed_key(key)).encode())
-    
-        
+        return db.get(str(hashed_key(key)).encode())        

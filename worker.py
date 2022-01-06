@@ -7,8 +7,8 @@ from util import get_db_size, hashed_key, allowed_file
 import sys
 import requests
 import io
+
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = '~/code/diststore/'
 
 @app.route('/worker/<worker_idx>')
 def create_worker(worker_idx):
@@ -16,7 +16,9 @@ def create_worker(worker_idx):
     worker = dstore.add_worker()
     #dstore.add_worker_to_master()
     print('DSTORE', dstore, 'worker:', worker)
-    return jsonify(str(worker))
+    if worker is not None:
+        worker = str(worker)
+    return jsonify(worker)
 
 
 @app.route('/put/<key>/<val>')
@@ -35,18 +37,22 @@ def put_req(key, val):
             'dbsize':get_db_size(dstore.worker_idx),
             }
     r = requests.post('http://localhost:5000/add_worker', payload)
-    print(r.text)
+    if ret is not None:
+        ret = str(ret)
+    #print(r.text)
     return jsonify(ret)
 
 @app.route('/get/<key>')
 def get_req(key):
     ret = dstore.get(key)
-    return jsonify(str(ret.decode('utf-8')))
+    if ret is not None:
+        ret = str(ret.decode('utf-8'))
+    return jsonify(ret)
 
 @app.route('/clear')
 def clear():
     dstore.clear_worker()
-    return jsonify("Cleared workers...clear server if you havent")
+    return jsonify("Cleared worker..")
 
 
 if __name__ == "__main__":
