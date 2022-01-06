@@ -2,6 +2,8 @@ import plyvel
 import os
 from util import get_db_size, hashed_key
 
+# content_idx is the index of the key/value you store
+# worker_idx is specified by the /worker/<worker_idx> 
 class DistStore():
     def __init__(self):
         self.stores = {}
@@ -19,7 +21,6 @@ class DistStore():
     
     def k_in_master(self, idx):
         for k, _ in self.master:
-            print('k...', k)
             if k == idx:
                 return True
         return False
@@ -37,11 +38,11 @@ class DistStore():
         worker = list(self.workers.values())[0]
         for k, _ in worker:
             worker.delete(k)
+    
     # call this after we reach a certain amount of data hit
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
-        #print(hashed_key(self.worker_idx-1))
         self.workers[str(hashed_key(self.worker_idx -1)).encode()] = db
         self.worker_idx += 1
         return db
@@ -50,13 +51,12 @@ class DistStore():
     def add_worker_to_master(self, hashed_idx, db_size):
         print('DB:', hashed_idx) # checks if the worker db is correct.
         self.master.put(hashed_idx, db_size)
-        print('added new woker to master!!!')
+        print('added new worker to master!!!')
 
     def put(self,key,val):
         hashed_k = str(hashed_key(key)).encode()
         hashed_worker_idx = str(hashed_key(self.worker_idx -2)).encode()
-        db = self.workers[hashed_worker_idx]
-        #print(db, self.worker_idx-1, self.content_idx)
+        db = self.workers[hashed_worker_idx] 
         db.put(hashed_k, str(val).encode())
         self.content_idx +=1
         return val
