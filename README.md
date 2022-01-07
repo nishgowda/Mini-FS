@@ -27,14 +27,14 @@ curl --X http://localhost:5001/delete/'A'	# should delete key 'A' with value 'ha
 ```
 ### API
 The standard functions of the API
-- GET /master/
-- GET /worker/<worker_idx>
+- GET `/master/`
+- GET `/worker/<worker_idx>`
 	- creates a new worker process with the given index	
-- GET /get/<idx>
+- GET `/get/<idx>`
 	- gets a value with the given key index 
-- PUT /put/<key>/<val>
+- PUT `/put/<key>/<val>`
 	- put a new value in the worker with a given key and value
-- DELETE /delete/<key>
+- DELETE `/delete/<key>`
 	- deletes from the database with a given key
 Master
 ```
