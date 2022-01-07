@@ -1,6 +1,6 @@
 import unittest
 from diststore import DistStore
-
+from util import hashed_key
 dstore = DistStore()
 class TestDistStore(unittest.TestCase):
     
@@ -11,11 +11,16 @@ class TestDistStore(unittest.TestCase):
         worker = dstore.add_worker()
         self.assertRegex(str(worker), "<plyvel.DB with name '/tmp/cachedb/worker/0'")
     def test_put(self):
-        result = dstore.put(0, 'A')
-        self.assertEqual(result, 'A')
+        result = dstore.put('A', 'hello')
+        self.assertEqual(result, 'hello')
+    def test_put(self):
+        result = dstore.put('B', 'bye')
+        self.assertEqual(result, 'bye')
     def test_get(self): 
-        result = dstore.get(0)
-        self.assertEqual(result, 'A'.encode())
-
+        result = dstore.get('A')
+        self.assertEqual(result, 'hello'.encode())
+    def test_delete(self):
+        result = dstore.delete('B')
+        self.assertEqual(result, hashed_key('B').encode())
 if __name__ == "__main__":
     unittest.main()
