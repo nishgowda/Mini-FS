@@ -7,7 +7,7 @@ from util import get_db_size, hashed_key
 class DistStore():
     def __init__(self):
         self.stores = {}
-        self.workers = {}
+        self.worker = None
         self.content_idx = 0
         self.worker_idx = 0
         self.master = None
@@ -35,15 +35,15 @@ class DistStore():
         #self.masters.close()
 
     def clear_worker(self):
-        worker = list(self.workers.values())[0]
-        for k, _ in worker:
-            worker.delete(k)
+        for k, _ in self.worker:
+            self.worker.delete(k)
     
     # call this after we reach a certain amount of data hit
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
-        self.workers[str(hashed_key(self.worker_idx -1)).encode()] = db
+        #self.set_worker_idx(str(hashed_key(self.worker_idx -1)).encode())
+        self.worker = db
         self.worker_idx += 1
         return db
     
@@ -55,13 +55,14 @@ class DistStore():
 
     def put(self,key,val):
         hashed_k = str(hashed_key(key)).encode()
-        hashed_worker_idx = str(hashed_key(self.worker_idx -2)).encode()
-        db = self.workers[hashed_worker_idx] 
-        db.put(hashed_k, val.encode())
+        self.worker.put(hashed_k, val.encode())
         self.content_idx +=1
         return val
 
     def get(self, key):
-        hashed_k = str(hashed_key(self.worker_idx-2)).encode()
-        db = self.workers[hashed_k]
-        return db.get(str(hashed_key(key)).encode())     
+        return self.worker.get(str(hashed_key(key)).encode())  
+
+    def delete(self, key):
+        h_key = hashed_key(key)
+        self.worker.delete(str(h_key).encode())
+        return h_key.encode()

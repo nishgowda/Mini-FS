@@ -36,6 +36,7 @@ The standard functions of the API
 	- put a new value in the worker with a given key and value
 - DELETE `/delete/<key>`
 	- deletes from the database with a given key
+
 Master
 ```
 /master

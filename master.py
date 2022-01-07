@@ -17,12 +17,12 @@ def create_master():
 def add_worker():
     if request.method == 'POST':
         vals = request.form
-        print(vals)
-        key = vals['key']
-        db_size = vals['dbsize'].encode()
-        #print(data, data.form,data.values)
+        # grab meta_data and key from it
+        meta_data = str(vals)
+        key = str(vals['key'])
+        print(key, meta_data)
         if not dstore.k_in_master(key.encode()):
-            dstore.add_worker_to_master(key.encode(), db_size)
+            dstore.add_worker_to_master(key.encode(), meta_data.encode())
         return jsonify("Added worker: ", key)
 
 @app.route('/clear')

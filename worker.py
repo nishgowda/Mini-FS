@@ -7,7 +7,7 @@ from util import get_db_size, hashed_key, allowed_file
 import sys
 import requests
 import io
-
+import time
 app = Flask(__name__)
 
 @app.route('/worker/<worker_idx>')
@@ -31,12 +31,14 @@ def put_req(key, val):
         ret = 'Saved ' + val
     else:
         ret = dstore.put(key, val)
-    # make the payload here
-    payload = {
-            'key': str(hashed_key(dstore.worker_idx)),
-            'dbsize':get_db_size(dstore.worker_idx),
+
+    # make the payload here; gonna be metadata
+    metadata = {
+                'key': str(hashed_key(dstore.worker_idx)),
+                'dbsize':get_db_size(dstore.worker_idx),
+                'created_at': time.strftime("%Y, %m, %d, %H, %M, %S")
             }
-    r = requests.post('http://localhost:5000/add_worker', payload)
+    r = requests.post('http://localhost:5000/add_worker', metadata)
     if ret is not None:
         ret = str(ret)
     #print(r.text)
@@ -45,6 +47,12 @@ def put_req(key, val):
 @app.route('/get/<key>')
 def get_req(key):
     ret = dstore.get(key)
+    if ret is not None:
+        ret = str(ret.decode('utf-8'))
+    return jsonify(ret)
+@app.route('/delete/<key>')
+def delete_req(key):
+    ret = dstore.delete(key)
     if ret is not None:
         ret = str(ret.decode('utf-8'))
     return jsonify(ret)
