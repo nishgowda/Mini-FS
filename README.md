@@ -33,7 +33,7 @@ The standard functions of the API
 - GET /get/<idx>
 	- gets a value with the given key index 
 - PUT /put/<key>/<val>
-	- puts a new value in the worker with a given key and value
+	- put a new value in the worker with a given key and value
 - DELETE /delete/<key>
 	- deletes from the database with a given key
 Master
