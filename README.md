@@ -6,7 +6,7 @@ A master server is created that will hold metadata about each worker node that i
 
 **Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/.
 
-
+## Usage
 ### Start the server
 *Note:* You must always start the master server before adding any key/value storage.
 
@@ -19,7 +19,15 @@ PORT=3000 ./worker 3001 &
 ```
 - Then you can make requests to the worker server by requesting put and get requests.
 - For each new worker you make, the master server will add metadata about it.
+```
+curl --X http://localhost:5000/master 			# runs the master server
+curl --X http://localhost:5001/worker			# runs the worker server
 
+curl --X http://localhost:5001/put/'A'/'happy'  	# should put 'happy' into 'A'
+curl --X http://localhost:5001/put_file/'B'/'cat.jpg'  	# should put the byte content of 'cat.jpg' into 'B'
+curl --X http://localhost:5001/get/'A'/			# should return 'happy'
+curl --X http://localhost:5001/delete/'A'		# should delete key 'A' with value 'happy' 
+```
 ## API
 - MASTER `/master/`
 - WORKER `/worker/<worker_idx>`
