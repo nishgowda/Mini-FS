@@ -8,10 +8,15 @@ import requests
 import io
 import time
 import os
-from decouple import config
+import subprocess
 
-#PORT=config('MASTER_PORT')
-PORT=os.environ['PORT']
+#MASTER=config('MASTER_MASTER')
+MASTER=os.environ['MASTER']
+try:
+    CLONE=os.environ['CLONE']
+except:
+    CLONE=False
+
 app = Flask(__name__)
 
 @app.route('/worker/<worker_idx>')
@@ -19,6 +24,8 @@ def create_worker(worker_idx):
     dstore.set_worker_idx(int(worker_idx))
     worker = dstore.add_worker()
     print('DSTORE', dstore, 'worker:', worker)
+    if CLONE:
+        os.system(f'./clone {CLONE} {worker_idx}')
     if worker is not None:
         worker = str(worker)
     return jsonify(worker)
@@ -34,7 +41,7 @@ def put_req(key, val):
                 'dbsize':get_db_size(dstore.worker_idx),
                 'created_at': time.strftime("%Y, %m, %d, %H, %M, %S")
             }
-    r = requests.post(f'http://localhost:{PORT}/add_worker', metadata)
+    r = requests.post(f'http://localhost:{MASTER}/add_worker', metadata)
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)
@@ -51,12 +58,10 @@ def put_file(key, path):
                 'dbsize':get_db_size(dstore.worker_idx),
                 'created_at': time.strftime("%Y, %m, %d, %H, %M, %S")
             }
-    r = requests.post(f'http://localhost:{PORT}/add_worker', metadata)
+    r = requests.post(f'http://localhost:{MASTER}/add_worker', metadata)
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)
-
-
 
 @app.route('/get/<key>')
 def get_req(key):
