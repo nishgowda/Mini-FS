@@ -28,11 +28,16 @@ class DistStore():
     def print_master(self):
         for k, v in self.master:
             print(k, v)
-    
+    def close_master(self):
+        self.master.close()
+        return "closed master"
+    def close_worker(self):
+        self.worker.close()
+        return "closed worker " + str(self.worker_idx)
+
     def clear_master(self):
         for k, _ in self.master:
             self.master.delete(k)
-        #self.masters.close()
 
     def clear_worker(self):
         for k, _ in self.worker:
@@ -42,16 +47,13 @@ class DistStore():
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
-        #self.set_worker_idx(str(hashed_key(self.worker_idx -1)).encode())
         self.worker = db
         self.worker_idx += 1
         return db
     
     # adds child to master
     def add_worker_to_master(self, hashed_idx, db_size):
-        print('DB:', hashed_idx) # checks if the worker db is correct.
         self.master.put(hashed_idx, db_size)
-        print('added new worker to master!!!')
 
     def put(self,key,val):
         hashed_k = str(hashed_key(key)).encode()

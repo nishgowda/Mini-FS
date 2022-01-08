@@ -30,5 +30,9 @@ def clear():
     dstore.clear_master()
     return jsonify("Cleared master...restart server")
 
+@app.route('/close')
+def close():
+    ret = dstore.close_master()
+    return jsonify(ret)
 if __name__ == "__main__":
     app.run()

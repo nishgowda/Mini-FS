@@ -1,3 +1,0 @@
-#!/bin/bash
-curl --X http://localhost:500$1/worker/$2
-curl --X http://localhost:500$1/put/'A'/'dsadsdas'
