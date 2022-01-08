@@ -35,19 +35,4 @@ PORT=3000 ./worker 3001 &
 - CLEAR `/clear/<worker_idx>`
 	- clears all keys from the worker given it's index
 
-## Usage
-### Starting the master and worker server
-```
-curl --X http://localhost:5000/master 		# runs the master server
-curl --X http://localhost:5001/worker		# runs a worker server on port 5001
-curl --X http://localhost:5002/worker		# runs a worker server on port 5002
-```
-# Making API Requests
-```
-curl --X http://localhost:5001/put/'A'/'happy'  # should put 'happy' into 'A'
-curl --X http://localhost:5001/put_file/'B'/'cat.jpg'  # should put the byte content of 'cat.jpg' into 'B'
-curl --X http://localhost:5001/get/'A'/		# should return 'happy'
-curl --X http://localhost:5001/delete/'A'	# should delete key 'A' with value 'happy' 
-```
-
 **Note:** Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.
