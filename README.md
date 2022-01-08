@@ -12,6 +12,12 @@ A master server is created that will hold metadata about each worker node that i
 
 - Run `./master <port_number>` and `PORT=<master_port_number> ./worker <port_number>` seperately. 
 - Run `./start-master <master_port_number> && ./demp <worker_port_number> <content_id>` to quickly run a quick example.
+- You can create a new worker that starts as a clone of another with the `CLONE` flag.
+```
+CLONE=0 MASTER=3000 ./worker 3002
+```
+This allows the new worker on 3002 to copy the contents of the worker with index 0.
+
 ```
 ./master 3000 & 
 MASTER=3000 ./worker 3001 &
@@ -28,11 +34,7 @@ curl --X http://localhost:5001/put_file/'B'/'cat.jpg'  	# should put the byte co
 curl --X http://localhost:5001/get/'A'/			# should return 'happy'
 curl --X http://localhost:5001/delete/'A'		# should delete key 'A' with value 'happy' 
 ```
-diststore also supports cloning worker proceesses with the CLONE flag. 
-```
-CLONE=0 MASTER=3000 ./worker 3002
-```
-This allows the new worker on 3002 to copy the contents of the worker with index 0.
+
 ## API
 - MASTER `/master/`
 - WORKER `/worker/<worker_idx>`
