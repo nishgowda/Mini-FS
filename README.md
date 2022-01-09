@@ -1,8 +1,9 @@
 # catstore
+<img src="cat.jpg" alt="cat" width="800"/>
 
-A *simple* distributed key value store in python. All work is handled by leveldb and flask with gunicorn (to make it faster).
+An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
 
-A master server is created that will hold metadata about each worker node that is created. All work is handled by worker nodes and the master node adds metadata about the worker and creates a new worker node every time you run `worker.py` on a different server.
+All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node creates a new worker node every time a new worker is spun up on a different server.
 
 **Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/.
 
@@ -27,15 +28,6 @@ This allows the new worker on 3002 to copy the contents of the worker with index
 
 - Then you can make requests to the worker server by requesting put and get requests.
 - For each new worker you make, the master server will add metadata about it.
-```
-curl --X http://localhost:5000/master 			# runs the master server
-curl --X http://localhost:5001/worker			# runs the worker server
-
-curl --X http://localhost:5001/put/'A'/'happy'  	# should put 'happy' into 'A'
-curl --X http://localhost:5001/put_file/'B'/'cat.jpg'  	# should put the byte content of 'cat.jpg' into 'B'
-curl --X http://localhost:5001/get/'A'/			# should return 'happy'
-curl --X http://localhost:5001/delete/'A'		# should delete key 'A' with value 'happy' 
-```
 
 ## API
 - MASTER `/master/`
@@ -57,4 +49,13 @@ curl --X http://localhost:5001/delete/'A'		# should delete key 'A' with value 'h
 - CLOSE `/close/`  (on master) 
 	- closes all connections to the master server
 
+```
+curl --X http://localhost:5000/master 			# runs the master server
+curl --X http://localhost:5001/worker			# runs the worker server
+
+curl --X http://localhost:5001/put/'A'/'happy'  	# should put 'happy' into 'A'
+curl --X http://localhost:5001/put_file/'B'/'cat.jpg'  	# should put the byte content of 'cat.jpg' into 'B'
+curl --X http://localhost:5001/get/'A'/			# should return 'happy'
+curl --X http://localhost:5001/delete/'A'		# should delete key 'A' with value 'happy' 
+```
 **Note:** Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.

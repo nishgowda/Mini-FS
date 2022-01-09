@@ -8,7 +8,6 @@ import requests
 import io
 import time
 import os
-import subprocess
 
 #MASTER=config('MASTER_MASTER')
 MASTER=os.environ['MASTER']
