@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-from diststore import DistStore
+from catstore import CatStore
 from flask import Flask, jsonify, request
 import json
 from util import get_db_size
 
 app = Flask(__name__)
 
-dstore = DistStore()
+catstore = CatStore()
 @app.route('/master')
 def create_master():
-    ret = dstore.create_master()
+    ret = catstore.create_master()
     return jsonify(str(ret))
 
 @app.route('/add_worker', methods=['POST'])
@@ -21,18 +21,18 @@ def add_worker():
         meta_data = str(vals)
         key = str(vals['key'])
         print(key, meta_data)
-        if not dstore.k_in_master(key.encode()):
-            dstore.add_worker_to_master(key.encode(), meta_data.encode())
+        if not catstore.k_in_master(key.encode()):
+            catstore.add_worker_to_master(key.encode(), meta_data.encode())
         return jsonify("Added worker: ", key)
 
 @app.route('/clear')
 def clear():
-    dstore.clear_master()
+    catstore.clear_master()
     return jsonify("Cleared master...restart server")
 
 @app.route('/close')
 def close():
-    ret = dstore.close_master()
+    ret = catstore.close_master()
     return jsonify(ret)
 if __name__ == "__main__":
     app.run()

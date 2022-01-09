@@ -1,4 +1,4 @@
-# diststore
+# catstore
 
 A *simple* distributed key value store in python. All work is handled by leveldb and flask with gunicorn (to make it faster).
 
@@ -10,19 +10,21 @@ A master server is created that will hold metadata about each worker node that i
 ### Start the server
 *Note:* You must always start the master server before adding any key/value storage.
 
-- Run `./master <port_number>` and `PORT=<master_port_number> ./worker <port_number>` seperately. 
+- Run `./master <port_number>` to spin up the master server .
+- Run `MASTER=<master_port_number> ./worker <port_number>` to spin up a worker.
 - Run `./start-master <master_port_number> && ./demp <worker_port_number> <content_id>` to quickly run a quick example.
-- You can create a new worker that starts as a clone of another with the `CLONE` flag.
-```
-CLONE=0 MASTER=3000 ./worker 3002
-```
-This allows the new worker on 3002 to copy the contents of the worker with index 0.
-
 ```
 ./master 3000 & 
 MASTER=3000 ./worker 3001 &
 ./start-master 3000 && ./demo 3001 0
 ```
+### Replicating workers
+You can also create a new worker that starts as a clone of another with the `CLONE` flag.
+```
+CLONE=0 MASTER=3000 ./worker 3002
+```
+This allows the new worker on 3002 to copy the contents of the worker with index 0.
+
 - Then you can make requests to the worker server by requesting put and get requests.
 - For each new worker you make, the master server will add metadata about it.
 ```
@@ -37,6 +39,7 @@ curl --X http://localhost:5001/delete/'A'		# should delete key 'A' with value 'h
 
 ## API
 - MASTER `/master/`
+	- spins up the master conenction on the master server
 - WORKER `/worker/<worker_idx>`
 	- creates a new worker process with the given index	
 - GET `/get/<idx>`
@@ -49,5 +52,9 @@ curl --X http://localhost:5001/delete/'A'		# should delete key 'A' with value 'h
 	- deletes from the database with a given key
 - CLEAR `/clear/<worker_idx>`
 	- clears all keys from the worker given it's index
+- CLOSE `/close/<worker_idx>`
+	- closes all connections to the worker server with the given index
+- CLOSE `/close/`  (on master) 
+	- closes all connections to the master server
 
 **Note:** Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.

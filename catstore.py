@@ -4,7 +4,7 @@ from util import get_db_size, hashed_key
 
 # content_idx is the index of the key/value you store
 # worker_idx is specified by the /worker/<worker_idx> 
-class DistStore():
+class CatStore():
     def __init__(self):
         self.stores = {}
         self.worker = None
