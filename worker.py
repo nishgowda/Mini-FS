@@ -10,6 +10,7 @@ import time
 import os
 
 #MASTER=config('MASTER_MASTER')
+
 MASTER=os.environ['MASTER']
 try:
     CLONE=os.environ['CLONE']
