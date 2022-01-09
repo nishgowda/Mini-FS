@@ -3,10 +3,28 @@
 
 An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
 
-All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node creates a new worker node every time a new worker is spun up on a different server. All worker indices are automatically incremnted on creation.
+All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node creates a new worker node every time a new worker is spun up on a different server. All worker indices are automatically incremnted on creation and all keys put are hashed and indexed intentionally.
+
+## Supported OS
+```
+Most forms of Linux should be supported without errors.
+Mac may experience errors in installing leveldb. This is mostly a dependency issue only.
+Windows has not yet been tested.
+```
+
+## Installing
+```
+cd
+git clone https://github.com/nishgowda/catstore
+cd catstore
+python3 -m venv env
+source env/bin/activate
+pip3 install -r requirements.txt
+```
+
 **Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/.
 
-## Start the server
+## Start the servers
 *Note:* You must always start the master server before adding any key/value storage.
 Use the bash script *main* to quickly spin up master and worker servers in the background.
 ```
