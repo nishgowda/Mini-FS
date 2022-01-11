@@ -2,14 +2,11 @@ import unittest
 from kitten import KittenFS
 from util import hashed_key
 kitten = KittenFS()
+kitten.create_master()
+kitten.add_worker()
 class TestKittenFS(unittest.TestCase):
-    
-    def test_create_master(self):
-        master = kitten.create_master()
-        self.assertRegex(str(master), "<plyvel.DB with name '/tmp/cachedb/master'")
-    def test_add_worker(self):
-        worker = kitten.add_worker()
-        self.assertRegex(str(worker), "<plyvel.DB with name '/tmp/cachedb/worker/0'")
+     
+    # these need to be run before
     def test_put(self):
         result = kitten.put('A', 'hello')
         self.assertEqual(result, 'hello')

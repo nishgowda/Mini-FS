@@ -23,4 +23,5 @@ jobs:
       - name: Run pytest
         run: |
           ./mk
+          ./before.sh
           python3 tests.py
