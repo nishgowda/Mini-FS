@@ -18,11 +18,11 @@ def hashed_key(key):
     hashed_k = hasher.hexdigest()
     return hashed_k
 
-def get_meta_data(kitten):
+def get_meta_data(worker_idx):
     metadata = {
-                'key': str(hashed_key(kitten.worker_idx)),
-                'dbsize':get_db_size(kitten.worker_idx),
-                'created_at': time.strftime("%Y, %m, %d, %H, %M, %S")
+                'key': str(hashed_key(worker_idx)),
+                'dbsize':get_db_size(worker_idx),
+                'created_at': time.strftime("%Y/%m/%d %H:%M:%S")
             }
     return metadata        
 

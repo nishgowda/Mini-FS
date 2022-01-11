@@ -35,7 +35,7 @@ def put_req(key, val):
     ret = kitten.put(key, val)
 
     # make the payload here; gonna be metadata
-    metadata = get_meta_data(kitten)
+    metadata = get_meta_data(kitten.worker_idx)
     r = requests.post(f'http://localhost:{MASTER}/add_worker', metadata)
     if ret is not None:
         ret = str(ret)
@@ -48,7 +48,7 @@ def put_file(key, path):
     ret = 'Saved ' + path
     #print(ret)
     # make the payload here; gonna be metadata
-    metadata = get_meta_data(kitten)
+    metadata = get_meta_data(kitten.worker_idx)
     r = requests.post(f'http://localhost:{MASTER}/add_worker', metadata)
     if ret is not None:
         ret = str(ret)

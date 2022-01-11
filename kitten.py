@@ -11,6 +11,9 @@ class KittenFS():
         self.content_idx = 0
         self.worker_idx = 0
         self.master = None
+
+    def get_worker_idx(self):
+        return self.worker_idx
     
     def set_worker_idx(self, idx):
         self.worker_idx = idx
@@ -52,8 +55,8 @@ class KittenFS():
         return db
     
     # adds child to master
-    def add_worker_to_master(self, hashed_idx, db_size):
-        self.master.put(hashed_idx, db_size)
+    def add_worker_to_master(self, hashed_idx, metadata):
+        self.master.put(hashed_idx, metadata)
 
     def put(self,key,val):
         hashed_k = str(hashed_key(key)).encode()
@@ -70,6 +73,6 @@ class KittenFS():
         self.worker.delete(str(h_key).encode())
 
         # now update the master with the updated worker
-        metadata = get_meta_data(self.worker)
-        self.add_worker_to_master(str(h_key).encode(), metadata)
+        metadata = get_meta_data(self.worker_idx)
+        self.add_worker_to_master(str(h_key).encode(), str(metadata).encode())
         return h_key.encode()
