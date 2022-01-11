@@ -1,7 +1,7 @@
 # KittenFS
-<img src="cat.jpg" alt="cat" width="800"/>
+<img src="cat.jpg" alt="cat" width="600"/>
 
-An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
+[![Unit Tests](https://github.com/nishgowda/KittenFS/actions/workflows/tests.yml/badge.svg)](https://github.com/nishgowda/KittenFS/actions/workflows/tests.yml)An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
 
 All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node creates a new worker node every time a new worker is spun up on a different server. All worker indices are automatically incremnted on creation and all keys put are hashed and indexed intentionally.
 
@@ -16,7 +16,7 @@ Windows has not yet been tested.
 ```
 cd
 git clone https://github.com/nishgowda/kittenfs
-cd catstore
+cd KittenFS
 python3 -m venv env
 source env/bin/activate
 pip3 install -r requirements.txt
