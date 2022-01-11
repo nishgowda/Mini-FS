@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-from catstore import CatStore
+from kitten import KittenFS
 from flask import Flask, jsonify, request
 import json
 from util import get_db_size
 
 app = Flask(__name__)
 
-catstore = CatStore()
+kitten = KittenFS()
 @app.route('/master')
 def create_master():
-    ret = catstore.create_master()
+    ret = kitten.create_master()
     return jsonify(str(ret))
 
 @app.route('/add_worker', methods=['POST'])
@@ -21,18 +21,18 @@ def add_worker():
         meta_data = str(vals)
         key = str(vals['key'])
         print(key, meta_data)
-        if not catstore.k_in_master(key.encode()):
-            catstore.add_worker_to_master(key.encode(), meta_data.encode())
+        if not kitten.k_in_master(key.encode()):
+            kitten.add_worker_to_master(key.encode(), meta_data.encode())
         return jsonify("Added worker: ", key)
 
 @app.route('/clear')
 def clear():
-    catstore.clear_master()
+    kitten.clear_master()
     return jsonify("Cleared master...restart server")
 
 @app.route('/close')
 def close():
-    ret = catstore.close_master()
+    ret = kitten.close_master()
     return jsonify(ret)
 if __name__ == "__main__":
     app.run()

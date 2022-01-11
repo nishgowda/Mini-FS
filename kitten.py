@@ -1,10 +1,10 @@
 import plyvel
 import os
-from util import get_db_size, hashed_key
+from util import get_meta_data, hashed_key
 
 # content_idx is the index of the key/value you store
 # worker_idx is specified by the /worker/<worker_idx> 
-class CatStore():
+class KittenFS():
     def __init__(self):
         self.stores = {}
         self.worker = None
@@ -66,5 +66,10 @@ class CatStore():
 
     def delete(self, key):
         h_key = hashed_key(key)
+        # delete from worker
         self.worker.delete(str(h_key).encode())
+
+        # now update the master with the updated worker
+        metadata = get_meta_data(self.worker)
+        self.add_worker_to_master(str(h_key).encode(), metadata)
         return h_key.encode()

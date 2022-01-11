@@ -1,4 +1,4 @@
-# catstore
+# KittenFS
 <img src="cat.jpg" alt="cat" width="800"/>
 
 An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
@@ -15,7 +15,7 @@ Windows has not yet been tested.
 ## Installing
 ```
 cd
-git clone https://github.com/nishgowda/catstore
+git clone https://github.com/nishgowda/kittenfs
 cd catstore
 python3 -m venv env
 source env/bin/activate
@@ -29,8 +29,8 @@ pip3 install -r requirements.txt
 Use the bash script *main* to quickly spin up master and worker servers in the background.
 ```
 ./main master 3000 		# spin up master on 3000
-./main worker 3001 MASTER=3000	# spin up a worker on 3001; specifies master running on 3000
-./main worker 3002 MASTER=3000	# spin up a worker on 3002; specifies master running on 3000
+MASTER=3000 ./main worker 3001 	# spin up a worker on 3001; specifies master running on 3000
+MASTER=3000 ./main worker 3002 	# spin up a worker on 3002; specifies master running on 3000
 
 ```
 
