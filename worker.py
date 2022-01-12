@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
-from master import kitten
+from __init__ import kitten
 from flask import Flask, jsonify
 import json
-from util import get_db_size, hashed_key, get_meta_data
+from util import  get_meta_data
 import requests
 import time
 import os
 
-#MASTER=config('MASTER_MASTER')
 
 MASTER=os.environ['MASTER']
 try:
@@ -22,7 +21,7 @@ app = Flask(__name__)
 def create_worker(worker_idx):
     kitten.set_worker_idx(int(worker_idx))
     worker = kitten.add_worker()
-    print('DSTORE', kitten, 'worker:', worker)
+    print('kitten: ', kitten, 'worker:', worker)
     if CLONE:
         os.system(f'./clone {CLONE} {worker_idx}')
     if worker is not None:
@@ -36,7 +35,8 @@ def put_req(key, val):
 
     # make the payload here; gonna be metadata
     metadata = get_meta_data(kitten.worker_idx)
-    r = requests.post(f'http://localhost:{MASTER}/add_worker', metadata)
+
+    r = requests.post(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)
@@ -46,10 +46,9 @@ def put_file(key, path):
     data = infile.read()
     kitten.put(key, str(data))
     ret = 'Saved ' + path
-    #print(ret)
     # make the payload here; gonna be metadata
     metadata = get_meta_data(kitten.worker_idx)
-    r = requests.post(f'http://localhost:{MASTER}/add_worker', metadata)
+    r = requests.post(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)
@@ -63,10 +62,14 @@ def get_req(key):
 
 @app.route('/delete/<key>')
 def delete_req(key):
-    ret = kitten.delete(key)
+    ret = kitten.delete(key, with_hash=False)
     if ret is not None:
         ret = str(ret.decode('utf-8'))
     return jsonify(ret)
+
+@app.route('/getindex')
+def get_index():
+    return jsonify(kitten.worker_idx - 1)
 
 @app.route('/clear')
 def clear():

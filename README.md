@@ -26,28 +26,27 @@ source env/bin/activate
 pip3 install -r requirements.txt
 ```
 
-**Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/.
+**Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/. You can use `mk.sh` script to automatically make this for you.
 
 ## Start the servers
 *Note:* You must always start the master server before adding any key/value storage.
 Use the bash script *main* to quickly spin up master and worker servers in the background.
 ```
-./main master 3000 		# spin up master on 3000
-MASTER=3000 ./main worker 3001 	# spin up a worker on 3001; specifies master running on 3000
-MASTER=3000 ./main worker 3002 	# spin up a worker on 3002; specifies master running on 3000
+./main.sh master 3000 			# spin up master on 3000
+MASTER=3000 ./main.sh worker 3001 	# spin up a worker on 3001; specifies master running on 3000
+MASTER=3000 ./main.sh worker 3002 	# spin up a worker on 3002; specifies master running on 3000
 
 ```
 
-Run `./start-master <master_port_number> && ./demo <worker_port_number> <content_id>` to quickly run a quick example.
-
+If you want to start the master and worker server on ports 3000 and 3001 respectively, while seeing a demo of the application, feel free to run this command that uses shell scripts to do this.
 ```
-./start-master 3000 && ./demo 3001 0
+./start-master.sh 3000 && ./demo.sh 3001 0
 ```
 
 ### Replicating workers
 You can also create a new worker that starts as a clone of another with the `CLONE` flag.
 ```
-CLONE=1 MASTER=3000 ./main worker 3003
+CLONE=1 MASTER=3000 ./main.sh worker 3003
 ```
 This allows the new worker on 3002 to copy the contents of the worker with index 1.
 

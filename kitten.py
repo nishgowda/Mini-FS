@@ -1,17 +1,16 @@
 import plyvel
 import os
 from util import get_meta_data, hashed_key
+import requests
+import json
 
-# content_idx is the index of the key/value you store
-# worker_idx is specified by the /worker/<worker_idx> 
 class KittenFS():
     def __init__(self):
-        self.stores = {}
         self.worker = None
-        self.content_idx = 0
-        self.worker_idx = 0
         self.master = None
-
+        self.content_idx = 0 # index of the key/value that's stored
+        self.worker_idx = 0  # index of the worker 
+    
     def get_worker_idx(self):
         return self.worker_idx
     
@@ -31,12 +30,14 @@ class KittenFS():
     def print_master(self):
         for k, v in self.master:
             print(k, v)
-    def close_master(self):
-        self.master.close()
-        return "closed master"
+    
     def close_worker(self):
         self.worker.close()
         return "closed worker " + str(self.worker_idx)
+    
+    def close_master(self):
+        self.master.close()
+        return "closed master"
 
     def clear_master(self):
         for k, _ in self.master:
@@ -44,8 +45,8 @@ class KittenFS():
 
     def clear_worker(self):
         for k, _ in self.worker:
-            self.worker.delete(k)
-    
+            self.delete(k, with_hash=True)
+
     # call this after we reach a certain amount of data hit
     def add_worker(self):
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
@@ -67,12 +68,18 @@ class KittenFS():
     def get(self, key):
         return self.worker.get(str(hashed_key(key)).encode())  
 
-    def delete(self, key):
-        h_key = hashed_key(key)
-        # delete from worker
-        self.worker.delete(str(h_key).encode())
+    def delete(self, key, with_hash):
+        if with_hash:
+            h_key = key
+            self.worker.delete(h_key)
+        else:
+            h_key = str(hashed_key(key)).encode() 
+            self.worker.delete(h_key)
+        requests.get(f'http://localhost:3000/delete/{h_key}')
+        return str(hashed_key(key)).encode()
 
-        # now update the master with the updated worker
-        metadata = get_meta_data(self.worker_idx)
-        self.add_worker_to_master(str(h_key).encode(), str(metadata).encode())
-        return h_key.encode()
+    def delete_from_master(self, h_key):
+        #print(h_key, str(h_key).encode())
+        ret = self.master.delete(str(h_key).encode())
+        #print(f'deleted {ret} from master')
+        return ret
