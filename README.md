@@ -7,7 +7,7 @@
 
 An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
 
-All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node creates a new worker node every time a new worker is spun up on a different server. All worker indices are automatically incremnted on creation and all keys put are hashed and indexed intentionally.
+All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node creates a new worker node every time a new worker is spun up on a different server. All worker indices are automatically incremented on creation and all keys put are hashed and indexed intentionally.
 
 ## Supported OS
 ```

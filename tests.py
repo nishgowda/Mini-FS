@@ -19,7 +19,7 @@ class TestKittenFS(unittest.TestCase):
         self.assertEqual(result, 'hello'.encode())
     def test_delete(self):
         kitten.put('B', 'bye')
-        result = kitten.delete('B')
+        result = kitten.delete('B', with_hash=False, is_testing=True)
         self.assertEqual(result, hashed_key('B').encode())
 if __name__ == "__main__":
     unittest.main()

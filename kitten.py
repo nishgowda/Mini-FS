@@ -45,7 +45,7 @@ class KittenFS():
 
     def clear_worker(self):
         for k, _ in self.worker:
-            self.delete(k, with_hash=True)
+            self.delete(k, with_hash=True, is_testing=False)
 
     # call this after we reach a certain amount of data hit
     def add_worker(self):
@@ -68,14 +68,15 @@ class KittenFS():
     def get(self, key):
         return self.worker.get(str(hashed_key(key)).encode())  
 
-    def delete(self, key, with_hash):
+    def delete(self, key, with_hash, is_testing):
         if with_hash:
             h_key = key
             self.worker.delete(h_key)
         else:
             h_key = str(hashed_key(key)).encode() 
             self.worker.delete(h_key)
-        requests.get(f'http://localhost:3000/delete/{h_key}')
+        if is_testing == False:
+            requests.get(f'http://localhost:3000/delete/{h_key}')
         return str(hashed_key(key)).encode()
 
     def delete_from_master(self, h_key):

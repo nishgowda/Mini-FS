@@ -62,7 +62,7 @@ def get_req(key):
 
 @app.route('/delete/<key>')
 def delete_req(key):
-    ret = kitten.delete(key, with_hash=False)
+    ret = kitten.delete(key, with_hash=False, is_testing=False)
     if ret is not None:
         ret = str(ret.decode('utf-8'))
     return jsonify(ret)
