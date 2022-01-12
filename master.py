@@ -7,7 +7,7 @@ from util import get_db_size
 
 app = Flask(__name__)
 
-@app.route('/master')
+@app.route('/master', methods=['POST'])
 def create_master():
     ret = kitten.create_master()
     return jsonify(str(ret))
@@ -33,12 +33,12 @@ def gets():
         out[k.decode()] = v.decode()
     return jsonify(out)
 
-@app.route('/clear')
+@app.route('/clear', methods=['DELETE'])
 def clear():
     kitten.clear_master()
     return jsonify("Cleared master...restart server")
 
-@app.route('/delete/<key>')
+@app.route('/delete/<key>', methods=['DELETE'])
 def delete(key):
     return jsonify(kitten.delete_from_master(key))
 

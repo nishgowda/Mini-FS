@@ -7,7 +7,7 @@
 
 An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
 
-All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node creates a new worker node every time a new worker is spun up on a different server. All worker indices are automatically incremented on creation and all keys put are hashed and indexed intentionally.
+All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node adds metadata about the new worker whenever a new one is spun up on a different server. All worker indices are automatically incremented on creation and all keys put are hashed and indexed intentionally.
 
 ## Supported OS
 ```
@@ -18,9 +18,9 @@ Windows has not yet been tested.
 
 ## Installing
 ```
-cd
+cd ~
 git clone https://github.com/nishgowda/kittenfs
-cd KittenFS
+cd kittenFS
 python3 -m venv env
 source env/bin/activate
 pip3 install -r requirements.txt
@@ -54,26 +54,33 @@ This allows the new worker on 3002 to copy the contents of the worker with index
 - For each new worker you make, the master server will add metadata about it.
 
 ## API
-- GET `/master/`
+#### Master
+- POST `/master/`
+- GET `/add_worker`
+- GET `/gets`
+- DELETE `/delete/<key>`
+- DELETE `/clear/`
+- GET `/close/`
+
+#### Worker
 - POST `/worker/<worker_idx>`
 - GET `/get/<idx>`
 - PUT `/put/<key>/<val>`
 - PUT `/put_file/<key>/<path>`
 - DELETE `/delete/<key>`
-- DELETE `/clear/`
-- GET `/close/`
-
+- CLEAR `/clear`
+- GET `/close`
 ### Usage
 ```
-curl --X http://localhost:3000/master 			# runs the master server
-curl --X http://localhost:3001/worker			# runs the worker server
+curl -X POST http://localhost:3000/master 			# runs the master server
+curl -X POST http://localhost:3001/worker			# runs the worker server
 
-curl --X http://localhost:3001/put/'A'/'happy'  	# should put 'happy' into 'A'
-curl --X http://localhost:3001/put_file/'B'/'cat.jpg'  	# should put the byte content of 'cat.jpg' into 'B'
-curl --X http://localhost:3001/get/'A'/			# should return 'happy'
-curl --X http://localhost:3001/delete/'A'		# should delete key 'A' with value 'happy' 
-curl --X http://localhost:3001/clear/			# should clear all data left in worker
-curl --X http://localhost:3001/close/			# closes connection to worker
-curl --X http://localhost:3000/close			# closes connection to master
+curl -X  PUT http://localhost:3001/put/'A'/'happy'  		# should put 'happy' into 'A'
+curl -X  PUT http://localhost:3001/put_file/'B'/'cat.jpg'  	# should put the byte content of 'cat.jpg' into 'B'
+curl --X http://localhost:3001/get/'A'/				# should return 'happy'
+curl --X http://localhost:3001/delete/'A'			# should delete key 'A' with value 'happy' 
+curl -X  DELETE http://localhost:3001/clear/			# should clear all data left in worker
+curl --X http://localhost:3001/close/				# closes connection to worker
+curl --X http://localhost:3000/close				# closes connection to master
 ```
 **Note:** Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.

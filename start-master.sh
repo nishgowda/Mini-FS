@@ -1,2 +1,2 @@
 #!/bin/bash
-curl --X http://localhost:$1/master
+curl -X POST http://localhost:$1/master

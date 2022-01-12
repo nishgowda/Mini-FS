@@ -17,11 +17,11 @@ except:
 
 app = Flask(__name__)
 
-@app.route('/worker/<worker_idx>')
+@app.route('/worker/<worker_idx>', methods=['POST'])
 def create_worker(worker_idx):
     kitten.set_worker_idx(int(worker_idx))
     worker = kitten.add_worker()
-    print('kitten: ', kitten, 'worker:', worker)
+    #print('worker:', worker)
     if CLONE:
         os.system(f'./clone {CLONE} {worker_idx}')
     if worker is not None:
@@ -29,7 +29,7 @@ def create_worker(worker_idx):
     return jsonify(worker)
 
 
-@app.route('/put/<key>/<val>')
+@app.route('/put/<key>/<val>', methods=['PUT'])
 def put_req(key, val):
     ret = kitten.put(key, val)
 
@@ -40,7 +40,7 @@ def put_req(key, val):
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)
-@app.route('/put_file/<key>/<path:path>')
+@app.route('/put_file/<key>/<path:path>', methods=['PUT'])
 def put_file(key, path):
     infile = open(path, 'rb')
     data = infile.read()
@@ -60,7 +60,7 @@ def get_req(key):
         ret = str(ret.decode('utf-8'))
     return jsonify(ret)
 
-@app.route('/delete/<key>')
+@app.route('/delete/<key>', methods=['DELETE'])
 def delete_req(key):
     ret = kitten.delete(key, with_hash=False, is_testing=False)
     if ret is not None:
@@ -71,7 +71,7 @@ def delete_req(key):
 def get_index():
     return jsonify(kitten.worker_idx - 1)
 
-@app.route('/clear')
+@app.route('/clear', methods=['DELETE'])
 def clear():
     kitten.clear_worker()
     return jsonify("Cleared worker..")
