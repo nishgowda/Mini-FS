@@ -1,4 +1,4 @@
-# KittenFS
+# kittenFS
 <p align="center">
 <img src="cat.jpg" alt="cat" width="600"/>
 </p>

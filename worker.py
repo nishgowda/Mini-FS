@@ -74,7 +74,7 @@ def get_index():
 @app.route('/clear', methods=['DELETE'])
 def clear():
     kitten.clear_worker()
-    return jsonify("Cleared worker..")
+    return jsonify("Cleared worker", testing=False)
 
 @app.route('/close')
 def close():

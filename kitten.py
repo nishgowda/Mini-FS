@@ -42,10 +42,12 @@ class KittenFS():
     def clear_master(self):
         for k, _ in self.master:
             self.master.delete(k)
+        return "Cleared master"
 
-    def clear_worker(self):
+    def clear_worker(self, testing):
         for k, _ in self.worker:
-            self.delete(k, with_hash=True, is_testing=False)
+            self.delete(k, with_hash=True, is_testing=testing)
+        return "Cleared worker"
 
     # call this after we reach a certain amount of data hit
     def add_worker(self):
@@ -58,6 +60,7 @@ class KittenFS():
     # adds child to master
     def add_worker_to_master(self, hashed_idx, metadata):
         self.master.put(hashed_idx, metadata)
+        return hashed_idx
 
     def put(self,key,val):
         hashed_k = str(hashed_key(key)).encode()
