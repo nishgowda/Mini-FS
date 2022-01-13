@@ -19,7 +19,7 @@ Windows has not yet been tested.
 ## Installing
 ```
 cd ~
-git clone https://github.com/nishgowda/kittenfs
+git clone https://github.com/nishgowda/kittenFS
 cd kittenFS
 python3 -m venv env
 source env/bin/activate
@@ -35,12 +35,11 @@ Use the bash script *main* to quickly spin up master and worker servers in the b
 ./main.sh master 3000 			# spin up master on 3000
 MASTER=3000 ./main.sh worker 3001 	# spin up a worker on 3001; specifies master running on 3000
 MASTER=3000 ./main.sh worker 3002 	# spin up a worker on 3002; specifies master running on 3000
-
 ```
 
 If you want to start the master and worker server on ports 3000 and 3001 respectively, while seeing a demo of the application, feel free to run this command that uses shell scripts to do this.
 ```
-./start-master.sh 3000 && ./demo.sh 3001 0
+./tools/start-master.sh 3000 && ./tools/demo.sh 3001 0
 ```
 
 ### Replicating workers
