@@ -43,7 +43,8 @@ def put_req(key):
             ret = kitten.put(key, data['value'])
     # make the payload here; gonna be metadata
     metadata = get_meta_data(kitten.worker_idx)
-    r = requests.put(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
+    print('metaddata', metadata)
+    r = requests.post(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)

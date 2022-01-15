@@ -7,7 +7,7 @@ from util import get_db_size
 
 app = Flask(__name__)
 
-@app.route('/master', methods=['POST'])
+@app.route('/', methods=['POST'])
 def create_master():
     ret = kitten.create_master()
     return json.dumps(str(ret))
@@ -20,7 +20,6 @@ def add_worker():
             vals = json.loads(request.json)
             # grab meta_data and key from it
             meta_data = str(vals)
-            print("putting worker?")
             key = str(vals['key'])
             if not kitten.k_in_master(key.encode()):
                 kitten.add_worker_to_master(key.encode(), meta_data.encode())
