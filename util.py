@@ -23,7 +23,7 @@ def get_meta_data(worker_idx):
     db_dir =  f'/tmp/cachedb/worker/{worker_idx-1}' 
     p1 = subprocess.check_output(f'./get-size.sh {db_dir}', shell=True)
     dir_size = int(p1)
-    print(f"the db size of {db_dir} is: {dir_size}")
+    #print(f"the db size of {db_dir} is: {dir_size}")
     metadata = {
                 'key': str(hashed_key(worker_idx)),
                 'size': dir_size,

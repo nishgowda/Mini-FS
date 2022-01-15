@@ -4,7 +4,9 @@ from util import hashed_key, get_meta_data
 kitten = KittenFS()
 
 class TestKittenFS(unittest.TestCase):
-    # these need to be run before
+    # these need to be run in this order
+    # master and worker in particular should be made before any other 
+    # funs called
     def test_a_create_master(self):
         master = kitten.create_master()
         self.assertRegex(str(master), "<plyvel.DB with name '/tmp/cachedb/master'")

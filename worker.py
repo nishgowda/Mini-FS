@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from __init__ import kitten
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import json
 from util import  get_meta_data
 import requests
@@ -14,6 +14,7 @@ try:
     CLONE=os.environ['CLONE']
 except:
     CLONE=False
+
 
 app = Flask(__name__)
 
@@ -28,30 +29,25 @@ def create_worker(worker_idx):
         worker = str(worker)
     return jsonify(worker)
 
-
-@app.route('/put/<key>/<val>', methods=['PUT'])
-def put_req(key, val):
-    ret = kitten.put(key, val)
-
+@app.route('/put/<key>', methods=['PUT'])
+def put_req(key):
+    data =  request.get_json()
+    if not data:
+        return json.dumps("No data passed")
+    else:
+        try:
+            #print(data['file'])
+            ret = kitten.put(key, data['file'])
+        except:
+            #print(data['value'])
+            ret = kitten.put(key, data['value'])
     # make the payload here; gonna be metadata
     metadata = get_meta_data(kitten.worker_idx)
-
-    r = requests.post(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
+    r = requests.put(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)
-@app.route('/put_file/<key>/<path:path>', methods=['PUT'])
-def put_file(key, path):
-    infile = open(path, 'rb')
-    data = infile.read()
-    kitten.put(key, str(data))
-    ret = 'Saved ' + path
-    # make the payload here; gonna be metadata
-    metadata = get_meta_data(kitten.worker_idx)
-    r = requests.post(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
-    if ret is not None:
-        ret = str(ret)
-    return jsonify(ret)
+
 
 @app.route('/get/<key>')
 def get_req(key):
@@ -62,6 +58,7 @@ def get_req(key):
 
 @app.route('/delete/<key>', methods=['DELETE'])
 def delete_req(key):
+
     ret = kitten.delete(key, with_hash=False, is_testing=False)
     if ret is not None:
         ret = str(ret.decode('utf-8'))
