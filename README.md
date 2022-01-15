@@ -54,7 +54,7 @@ This allows the new worker on 3002 to copy the contents of the worker with index
 
 ## API
 #### Master
-- POST `/master/`
+- POST `/`
 - GET `/add_worker`
 - GET `/gets`
 - DELETE `/delete/<key>`
@@ -66,19 +66,19 @@ This allows the new worker on 3002 to copy the contents of the worker with index
 - GET `/get/<idx>`
 - PUT `/put/<key>`
 - DELETE `/delete/<key>`
-- CLEAR `/clear`
+- DELETE `/clear`
 - GET `/close`
 ### Usage
 ```
-curl -X POST localhost:3000											# runs the master server
-curl -X POST localhost:3001/worker										# runs the worker server
+curl -X POST localhost:3000						# runs the master server
+curl -X POST localhost:3001/worker/0					# runs the worker server on index 0
 
-curl -X  PUT -H "Content-Type: application/json" -d '{"value":"happy"}  localhost:3001/put/'A'			# should put 'happy' into 'A'
-curl -X  PUT -H "Content-Type: application/json" -d '{"file":"~/Downlaods/cat.jpg"}  localhost:3001/put/'B' 	# should put ~/Downloads/cat.jpg into 'B'
-curl --X localhost:3001/get/'A'											# should return 'happy'
-curl --X localhost:3001/delete/'A'										# should delete key 'A' with value 'happy' 
-curl -X  DELETE localhost:3001/clear										# should clear all data left in worker
-curl --X localhost:3001/close											# closes connection to worker
-curl --X localhost:3000/close											# closes connection to master
+curl -X  PUT -d value="happy" localhost:3001/put/'A'			# should put 'happy' into 'A'
+curl -X  PUT file="~/Downlaods/cat.jpg"  localhost:3001/put/'B' 	# should put ~/Downloads/cat.jpg into 'B'
+curl --X localhost:3001/get/'A'						# should return 'happy'
+curl -X  DELETE localhost:3001/clear					# should clear all data left in worker
+curl -X  DELETE localhost:3000/clear					# clears all data from master server
+curl --X localhost:3001/close						# closes connection to worker
+curl --X localhost:3000/close						# closes connection to master
 ```
 **Note:** Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.

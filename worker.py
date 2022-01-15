@@ -31,7 +31,8 @@ def create_worker(worker_idx):
 
 @app.route('/put/<key>', methods=['PUT'])
 def put_req(key):
-    data =  request.get_json()
+    data =  request.form
+    #print(data)
     if not data:
         return json.dumps("No data passed")
     else:
@@ -43,7 +44,7 @@ def put_req(key):
             ret = kitten.put(key, data['value'])
     # make the payload here; gonna be metadata
     metadata = get_meta_data(kitten.worker_idx)
-    print('metaddata', metadata)
+    #print('metaddata', metadata)
     r = requests.post(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
     if ret is not None:
         ret = str(ret)

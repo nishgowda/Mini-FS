@@ -15,17 +15,13 @@ def create_master():
 @app.route('/add_worker', methods=['POST'])
 def add_worker():
     if request.method == 'POST':
-        content_type = request.headers.get('Content-Type')
-        if content_type == 'application/json':
-            vals = json.loads(request.json)
-            # grab meta_data and key from it
-            meta_data = str(vals)
-            key = str(vals['key'])
-            if not kitten.k_in_master(key.encode()):
-                kitten.add_worker_to_master(key.encode(), meta_data.encode())
-            return json.dumps("Added worker: " + key)
-        else:
-            return "Content-Type not supported!"
+        vals = json.loads(request.json)
+        # grab meta_data and key from it
+        meta_data = str(vals)
+        key = str(vals['key'])
+        if not kitten.k_in_master(key.encode()):
+            kitten.add_worker_to_master(key.encode(), meta_data.encode())
+        return json.dumps("Added worker: " + key)
 
 @app.route('/gets')
 def gets():
