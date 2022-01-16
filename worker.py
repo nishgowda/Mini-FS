@@ -21,6 +21,7 @@ app = Flask(__name__)
 @app.route('/worker/<worker_idx>', methods=['POST'])
 def create_worker(worker_idx):
     kitten.set_worker_idx(int(worker_idx))
+    print('kitten indx', kitten.worker_idx)
     worker = kitten.add_worker()
     #print('worker:', worker)
     if CLONE:
@@ -43,9 +44,9 @@ def put_req(key):
             #print(data['value'])
             ret = kitten.put(key, data['value'])
     # make the payload here; gonna be metadata
-    metadata = get_meta_data(kitten.worker_idx)
+    metadata = get_meta_data(kitten.worker_idx, key)
     #print('metaddata', metadata)
-    r = requests.post(f'http://localhost:{MASTER}/add_worker', json=json.dumps(metadata))
+    r = requests.post(f'http://localhost:{MASTER}/add_worker/{kitten.worker_idx}', json=json.dumps(metadata))
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)

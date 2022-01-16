@@ -4,6 +4,7 @@ from __init__ import kitten
 from flask import Flask, request
 import json
 from util import get_db_size
+import ast
 
 app = Flask(__name__)
 
@@ -12,15 +13,34 @@ def create_master():
     ret = kitten.create_master()
     return json.dumps(str(ret))
 
-@app.route('/add_worker', methods=['POST'])
-def add_worker():
+@app.route('/add_worker/<worker_idx>', methods=['POST'])
+def add_worker(worker_idx):
     if request.method == 'POST':
+        worker_idx = int(worker_idx) - 1
         vals = json.loads(request.json)
         # grab meta_data and key from it
         meta_data = str(vals)
         key = str(vals['key'])
-        if not kitten.k_in_master(key.encode()):
-            kitten.add_worker_to_master(key.encode(), meta_data.encode())
+        #print("MONE",  worker_idx)
+        v = kitten.k_in_master(str(worker_idx).encode())
+        #print("prev is", v) 
+        if not v:
+            obj = [meta_data.encode()]
+            #prev = kitten.k_in_master(str(worker_idx - 1).encode())
+            #if not prev:
+                #print("AM I HERE?")
+            kitten.add_worker_to_master(str(worker_idx).encode(), str(obj).encode())
+            return json.dumps("Added worker: " + key)
+        else:
+             prev = v
+        prev = prev.decode()
+        obj = ast.literal_eval(prev)
+        #print("the prev is:", obj)
+        print("meta_data:", meta_data.encode())
+        obj.append(meta_data.encode())
+        #print("the obj:", obj)
+        kitten.add_worker_to_master(str(worker_idx).encode(), str(obj).encode())
+
         return json.dumps("Added worker: " + key)
 
 @app.route('/gets')

@@ -1,6 +1,6 @@
 import plyvel
 import os
-from util import get_meta_data, hashed_key
+from util import hashed_key
 import requests
 import json
 
@@ -22,9 +22,10 @@ class KittenFS():
         return self.master
     
     def k_in_master(self, idx):
-        for k, _ in self.master:
+        for k, v in self.master:
+            print(k, v)
             if k == idx:
-                return True
+                return v
         return False
     
     def print_master(self):

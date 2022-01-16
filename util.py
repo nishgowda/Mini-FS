@@ -19,13 +19,13 @@ def hashed_key(key):
     hashed_k = hasher.hexdigest()
     return hashed_k
 
-def get_meta_data(worker_idx):
+def get_meta_data(worker_idx, key):
     db_dir =  f'/tmp/cachedb/worker/{worker_idx-1}' 
     p1 = subprocess.check_output(f'./get-size.sh {db_dir}', shell=True)
     dir_size = int(p1)
     #print(f"the db size of {db_dir} is: {dir_size}")
     metadata = {
-                'key': str(hashed_key(worker_idx)),
+                'key': str(hashed_key(key)),
                 'size': dir_size,
                 'created_at': time.strftime("%Y/%m/%d %H:%M:%S")
             }
@@ -37,4 +37,3 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-get_meta_data(1)
