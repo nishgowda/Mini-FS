@@ -23,7 +23,7 @@ class KittenFS():
     
     def k_in_master(self, idx):
         for k, v in self.master:
-            print(k, v)
+            #print(k, v)
             if k == idx:
                 return v
         return False

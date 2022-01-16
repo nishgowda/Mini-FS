@@ -2,7 +2,7 @@ import os
 import hashlib
 import time
 import subprocess
-
+import json
 def get_db_size(worker_idx):
     db_dir =  f'/tmp/cachedb/worker/{worker_idx-1}'
     size = 0
@@ -25,11 +25,11 @@ def get_meta_data(worker_idx, key):
     dir_size = int(p1)
     #print(f"the db size of {db_dir} is: {dir_size}")
     metadata = {
-                'key': str(hashed_key(key)),
-                'size': dir_size,
-                'created_at': time.strftime("%Y/%m/%d %H:%M:%S")
+                "key": str(hashed_key(key)),
+                "size": dir_size,
+                "created_at": time.strftime("%Y/%m/%d %H:%M:%S")
             }
-    return metadata        
+    return json.dumps(metadata)     
 
 # straight from: https://flask.palletsprojects.com/en/2.0.x/patterns/fileuploads/
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}

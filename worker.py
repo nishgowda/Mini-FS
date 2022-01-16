@@ -3,7 +3,7 @@
 from __init__ import kitten
 from flask import Flask, jsonify, request
 import json
-from util import  get_meta_data
+from util import  get_meta_data, hashed_key
 import requests
 import time
 import os
@@ -34,19 +34,21 @@ def create_worker(worker_idx):
 def put_req(key):
     data =  request.form
     #print(data)
+    
     if not data:
         return json.dumps("No data passed")
     else:
         try:
             #print(data['file'])
-            ret = kitten.put(key, data['file'])
+            ret = kitten.put(hashed_key(key), data['file'])
         except:
             #print(data['value'])
-            ret = kitten.put(key, data['value'])
+            ret = kitten.put(hashed_key(key), data['value'])
     # make the payload here; gonna be metadata
     metadata = get_meta_data(kitten.worker_idx, key)
+    print("metadata is", metadata)
     #print('metaddata', metadata)
-    r = requests.post(f'http://localhost:{MASTER}/add_worker/{kitten.worker_idx}', json=json.dumps(metadata))
+    r = requests.post(f'http://localhost:{MASTER}/add_worker/{kitten.worker_idx}', json=metadata)
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)
@@ -54,7 +56,7 @@ def put_req(key):
 
 @app.route('/get/<key>')
 def get_req(key):
-    ret = kitten.get(key)
+    ret = kitten.get(hashed_key(key))
     if ret is not None:
         ret = str(ret.decode('utf-8'))
     return jsonify(ret)
@@ -82,4 +84,4 @@ def close():
     return jsonify(ret)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

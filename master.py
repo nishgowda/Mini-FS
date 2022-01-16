@@ -5,7 +5,7 @@ from flask import Flask, request
 import json
 from util import get_db_size
 import ast
-
+import requests
 app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
@@ -13,34 +13,45 @@ def create_master():
     ret = kitten.create_master()
     return json.dumps(str(ret))
 
+# this is accessed when we PUT a value into a worker
 @app.route('/add_worker/<worker_idx>', methods=['POST'])
 def add_worker(worker_idx):
     if request.method == 'POST':
         worker_idx = int(worker_idx) - 1
         vals = json.loads(request.json)
-        # grab meta_data and key from it
-        meta_data = str(vals)
         key = str(vals['key'])
-        #print("MONE",  worker_idx)
+        meta_data = str(vals)
+        
         v = kitten.k_in_master(str(worker_idx).encode())
-        #print("prev is", v) 
         if not v:
-            obj = [meta_data.encode()]
-            #prev = kitten.k_in_master(str(worker_idx - 1).encode())
-            #if not prev:
-                #print("AM I HERE?")
+            # if there is nothing in master, then we start with a 
+            # list of the current values meta data
+            obj = [meta_data.encode()]    
             kitten.add_worker_to_master(str(worker_idx).encode(), str(obj).encode())
             return json.dumps("Added worker: " + key)
         else:
+            # otherwise we get the previous data
              prev = v
+        # now we handle updating the metadata
         prev = prev.decode()
+        # create our list of dictionaries
         obj = ast.literal_eval(prev)
-        #print("the prev is:", obj)
-        print("meta_data:", meta_data.encode())
-        obj.append(meta_data.encode())
-        #print("the obj:", obj)
-        kitten.add_worker_to_master(str(worker_idx).encode(), str(obj).encode())
+        
+        # handles changes in key. if we update a key, then we only want
+        # to update that key and don't need to add more data to the master
+        for idx, item in enumerate(obj):
+            d = item.decode()
+            d = ast.literal_eval(d)
+            if d['key'] == key:
+                obj[idx] = vals # use vals here, bc we want an actual dict data structure
+                kitten.add_worker_to_master(str(worker_idx).encode(), str(obj).encode())
+                return json.dumps("Added worker: " + key)
 
+        # new data coming into already existing list of dicts, so we can 
+        # just append the new metadata to our list and add it to our
+        # master and attach it to the appropriate worker index
+        obj.append(meta_data.encode())
+        kitten.add_worker_to_master(str(worker_idx).encode(), str(obj).encode())
         return json.dumps("Added worker: " + key)
 
 @app.route('/gets')
@@ -65,4 +76,4 @@ def close():
     return json.dumps(ret)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
