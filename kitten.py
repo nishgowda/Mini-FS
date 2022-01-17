@@ -55,6 +55,7 @@ class KittenFS():
         path = f'/tmp/cachedb/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
         self.worker = db
+        print("self.worker is", self.worker)
         self.worker_idx += 1
         return db
     
@@ -64,6 +65,7 @@ class KittenFS():
         return hashed_idx
 
     def put(self,key,val):
+        print("Self.worker is...", self.worker)
         hashed_k = str(hashed_key(key)).encode()
         self.worker.put(hashed_k, val.encode())
         self.content_idx +=1

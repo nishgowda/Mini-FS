@@ -1,16 +1,38 @@
 #!/bin/bash
 
+num_workers=$1
+BUILD=$2
+NETWORK=$3
 # setup for running kittenfs on docker
 
+if [ -z $BUILD ]; then
+  echo "Not building containers..."
+else
 # 1.) build containers
-./tools/docker/build-docker.sh
+  docker build -f Dockerfile.master  -t kittenfs:master .
+  docker build -f Dockerfile.worker  -t kittenfs:worker .
+fi
 
 # 2.) create network
-docker network create kitten
+if [ -z $NETWORK ]; then
+  echo "Not creating network..."
+else
+  docker network create kitten
+fi
+# create volumes
+docker volume create --name mk
 
-# 3.) run containers now
-docker run -d -p 3000:3000 --net kitten --name target-host kittenfs:master
-docker run -d -p 3001:3001 --net kitten --name worker kittenfs:worker 
+# 3.) run master container now
+docker run -d -p 3000:3000 -v mk:/tmp --net kitten --name master kittenfs:master
 
-# 4.) add volumes for leveldb
-./tools/docker/docker_volumes.sh target-host worker
+# 4.) create /tmp/cachedb on disk for leveldb storage
+docker exec master mkdir /tmp/cachedb
+docker exec master mkdir /tmp/cachedb/master
+docker exec master mkdir /tmp/cachedb/worker
+
+# 5.) run worker containers now
+for i in $(seq 1 $num_workers);  do
+  # for the number of workers, the port is incremented by 1 and we assign the same volumes
+  # that we made for the master.
+  docker run -d -p "300$i":"300$i" -e PORT="300$i" -e DOCKER=True -e MASTER=3000 -v mk:/tmp --net kitten --name "worker_$i" kittenfs:worker 
+done

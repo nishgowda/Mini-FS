@@ -25,19 +25,23 @@ python3 -m venv env
 source env/bin/activate
 pip3 install -r requirements.txt
 ```
-**Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/. You can use `mk.sh` script to automatically make this for you.
+**Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/. You can use the `mk.sh` script in the *tools* directory to automatically make this for you.
 
 ### Using Docker
-You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. Feel free to run to setup it for you.
+You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. You can also control how many workers you want to spin up with a command line argument. 
 ```
-./docker-setup.sh
+./docker-setup.sh 2 # spins up 2 worker servers
 ```
-This builds two different containers, MASTER and a WORKER and creates a docker network between them that allows them to communicate with each other.
-Of course, this is currently meant as a way to quickly setup yourself up with docker for this project so it isn't really that scalable yet to building more workers. However, this is still developing and the plan is for that to happen.
+This builds *three* different containers, one MASTER and two WORKERS and creates a docker network between them that allows them to communicate with each other. The environment variables will already be setup and the ports will be starting from port 3001 and increase incrementally by 1 for each new worker you want to spin up (the master server starts at port 3000).
 
+Also, instead of rebuilding the containers and/or network for each run, you can specify BUILD or NETWORK to let it know you want them to run also.
+```
+./docker-setup.sh 2 BUILD NETWORK # specifies to build each docker images and create the network
+```
+**Note:** You need to do this on your first run, otherwise it will not work.
 ## Start the servers
-*Note:* You must always start the master server before adding any key/value storage.
-Use the bash script *main* to quickly spin up master and worker servers in the background.
+**Note**: You can skip the following step if you've used the docker-setup shell script and move straight to setting up the master and worker servers.
+Use the bash script *main* to quickly spin up master and worker servers in the background. It's key that you create the master server before any workers.
 ```
 ./main.sh master 3000 			# spin up master on 3000
 MASTER=3000 ./main.sh worker 3001 	# spin up a worker on 3001; specifies master running on 3000

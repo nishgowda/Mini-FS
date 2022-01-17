@@ -48,7 +48,7 @@ def put_req(key):
     # seperate request for if we are using docker
     # this handles the docker-network issue
     if DOCKER:
-         requests.post(f'http://target-host:{MASTER}/add_worker/{kitten.worker_idx}', json=metadata)
+        requests.post(f'http://master:{MASTER}/add_worker/{kitten.worker_idx}', json=metadata)
     else:
         requests.post(f'http://localhost:{MASTER}/add_worrker/{kitten.worker_idx}', json=metadata)
     if ret is not None:
