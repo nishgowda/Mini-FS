@@ -28,7 +28,7 @@ class TestKittenFS(unittest.TestCase):
         result = kitten.delete('B', with_hash=False, is_testing=True)
         self.assertEqual(result, hashed_key('B').encode())
     def test_g_add_worker_to_master(self):
-        meta_data = get_meta_data(kitten.worker_idx, 'A')
+        meta_data = get_meta_data(kitten.worker_idx, 'A', 'bye')
         h_key = hashed_key(kitten.worker_idx)
         result = kitten.add_worker_to_master(str(h_key).encode(), str(meta_data).encode())
         self.assertEqual(str(h_key).encode(), result)
