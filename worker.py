@@ -11,6 +11,10 @@ import os
 
 MASTER=os.environ['MASTER']
 try:
+    DOCKER=os.environ['DOCKER']
+except:
+    DOCKER=False
+try:
     CLONE=os.environ['CLONE']
 except:
     CLONE=False
@@ -22,7 +26,6 @@ app = Flask(__name__)
 def create_worker(worker_idx):
     kitten.set_worker_idx(int(worker_idx))
     worker = kitten.add_worker()
-    #print('worker:', worker)
     if CLONE:
         os.system(f'./clone {CLONE} {worker_idx}')
     if worker is not None:
@@ -32,21 +35,22 @@ def create_worker(worker_idx):
 @app.route('/put/<key>', methods=['PUT'])
 def put_req(key):
     data =  request.form
-    #print(data)
     
     if not data:
         return json.dumps("No data passed")
     else:
         try:
-            #print(data['file'])
             ret = kitten.put(hashed_key(key), data['file'])
         except:
-            #print(data['value'])
             ret = kitten.put(hashed_key(key), data['value'])
     # make the payload here; gonna be metadata
     metadata = get_meta_data(kitten.worker_idx, key, ret)
-    #print('metaddata', metadata)
-    r = requests.post(f'http://localhost:{MASTER}/add_worker/{kitten.worker_idx}', json=metadata)
+    # seperate request for if we are using docker
+    # this handles the docker-network issue
+    if DOCKER:
+         requests.post(f'http://target-host:{MASTER}/add_worker/{kitten.worker_idx}', json=metadata)
+    else:
+        requests.post(f'http://localhost:{MASTER}/add_worrker/{kitten.worker_idx}', json=metadata)
     if ret is not None:
         ret = str(ret)
     return jsonify(ret)

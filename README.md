@@ -25,8 +25,15 @@ python3 -m venv env
 source env/bin/activate
 pip3 install -r requirements.txt
 ```
-
 **Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/. You can use `mk.sh` script to automatically make this for you.
+
+### Using Docker
+You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. Feel free to run to setup it for you.
+```
+./docker-setup.sh
+```
+This builds two different containers, MASTER and a WORKER and creates a docker network between them that allows them to communicate with each other.
+Of course, this is currently meant as a way to quickly setup yourself up with docker for this project so it isn't really that scalable yet to building more workers. However, this is still developing and the plan is for that to happen.
 
 ## Start the servers
 *Note:* You must always start the master server before adding any key/value storage.
