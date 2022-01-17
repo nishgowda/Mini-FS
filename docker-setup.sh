@@ -1,8 +1,28 @@
 #!/bin/bash
+num_workers=1
+while test $# -gt 0; do
+  case $1 in 
+    -num_workers)
+      shift
+      num_workers=$1
+      shift
+      ;;
+    -build)
+      shift
+      BUILD=1
+      shift
+      ;;
+    -network)
+      shift
+      NETWORK=1
+      shift
+      ;;
+    *)
+      echo "$1 is not a flag"
+      ;;
+  esac
+done
 
-num_workers=$1
-BUILD=$2
-NETWORK=$3
 # setup for running kittenfs on docker
 
 if [ -z $BUILD ]; then
@@ -34,5 +54,5 @@ docker exec master mkdir /tmp/cachedb/worker
 for i in $(seq 1 $num_workers);  do
   # for the number of workers, the port is incremented by 1 and we assign the same volumes
   # that we made for the master.
-  docker run -d -p "300$i":"300$i" -e PORT="300$i" -e DOCKER=True -e MASTER=3000 -v mk:/tmp --net kitten --name "worker_$i" kittenfs:worker 
+      docker run -d -p "300$i":"300$i" -e PORT="300$i" -e DOCKER=True -e MASTER=3000  -v mk:/tmp --net kitten --name "worker_$i" kittenfs:worker 
 done

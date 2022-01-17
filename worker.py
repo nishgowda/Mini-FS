@@ -14,11 +14,6 @@ try:
     DOCKER=os.environ['DOCKER']
 except:
     DOCKER=False
-try:
-    CLONE=os.environ['CLONE']
-except:
-    CLONE=False
-
 
 app = Flask(__name__)
 
@@ -26,12 +21,13 @@ app = Flask(__name__)
 def create_worker(worker_idx):
     kitten.set_worker_idx(int(worker_idx))
     worker = kitten.add_worker()
-    if CLONE:
-        os.system(f'./clone {CLONE} {worker_idx}')
     if worker is not None:
         worker = str(worker)
     return jsonify(worker)
-
+@app.route('/clone/<prev>')
+def clone(prev): 
+    os.system(f'./clones.sh {prev} {worker_idx}')
+    return json.dumps("Cloned")
 @app.route('/put/<key>', methods=['PUT'])
 def put_req(key):
     data =  request.form

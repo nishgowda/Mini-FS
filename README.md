@@ -28,16 +28,15 @@ pip3 install -r requirements.txt
 **Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/. You can use the `mk.sh` script in the *tools* directory to automatically make this for you.
 
 ### Using Docker
-You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. You can also control how many workers you want to spin up with a command line argument. 
+You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. There are severall command line flags you can use here to meet your needs. 
+- You can control how many workers you want to spin up with `num_workers`
+- You can specify if you want to rebuild the images with `build`. This automates to 1, so the value you use here doesn't matter.
+- You can specify if you wan to create the docker-network with the `network` flag. This also automates to 1. 
 ```
-./docker-setup.sh 2 # spins up 2 worker servers
+./docker-setup.sh -num_workers 2 -build 1  # spins up 2 worker servers and builds the docker images.
 ```
 This builds *three* different containers, one MASTER and two WORKERS and creates a docker network between them that allows them to communicate with each other. The environment variables will already be setup and the ports will be starting from port 3001 and increase incrementally by 1 for each new worker you want to spin up (the master server starts at port 3000).
 
-Also, instead of rebuilding the containers and/or network for each run, you can specify BUILD or NETWORK to let it know you want them to run also.
-```
-./docker-setup.sh 2 BUILD NETWORK # specifies to build each docker images and create the network
-```
 **Note:** You need to do this on your first run, otherwise it will not work.
 ## Start the servers
 **Note**: You can skip the following step if you've used the docker-setup shell script and move straight to setting up the master and worker servers.
@@ -54,9 +53,9 @@ If you want to start the master and worker server on ports 3000 and 3001 respect
 ```
 
 ### Replicating workers
-You can also create a new worker that starts as a clone of another with the `CLONE` flag.
+You can also create a new worker that starts as a clone of another through the `clone` endpoint.
 ```
-CLONE=1 MASTER=3000 ./main.sh worker 3003
+curl --X localhost:3002/clone/1
 ```
 This allows the new worker on 3002 to copy the contents of the worker with index 1.
 

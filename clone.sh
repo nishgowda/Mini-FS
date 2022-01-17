@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 PREV=$1
 WORKER=$2
 
