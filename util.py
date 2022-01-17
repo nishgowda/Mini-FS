@@ -3,6 +3,8 @@ import hashlib
 import time
 import subprocess
 import json
+import sys
+
 def get_db_size(worker_idx):
     db_dir =  f'/tmp/cachedb/worker/{worker_idx-1}'
     size = 0
@@ -19,14 +21,15 @@ def hashed_key(key):
     hashed_k = hasher.hexdigest()
     return hashed_k
 
-def get_meta_data(worker_idx, key):
+def get_meta_data(worker_idx, key, ret):
     db_dir =  f'/tmp/cachedb/worker/{worker_idx-1}' 
     p1 = subprocess.check_output(f'./get-size.sh {db_dir}', shell=True)
     dir_size = int(p1)
     #print(f"the db size of {db_dir} is: {dir_size}")
     metadata = {
                 "key": str(hashed_key(key)),
-                "size": dir_size,
+                "size": sys.getsizeof(ret),
+                "worker_size": dir_size,
                 "created_at": time.strftime("%Y/%m/%d %H:%M:%S")
             }
     return json.dumps(metadata)     

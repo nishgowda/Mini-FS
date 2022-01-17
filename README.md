@@ -65,7 +65,9 @@ This allows the new worker on 3002 to copy the contents of the worker with index
 
 ### Usage
 ```
-curl -X POST localhost:3000						
+# spin up the master server
+curl -X POST localhost:3000
+# spin up a worker on port 3001 with index 0						
 curl -X POST localhost:3001/worker/0					
 
 # put 'happy' into 'A'
