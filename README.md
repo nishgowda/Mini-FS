@@ -53,32 +53,43 @@ This allows the new worker on 3002 to copy the contents of the worker with index
 - For each new worker you make, the master server will add metadata about it.
 
 ## API
-#### Master
-- POST `/`
-- GET `/add_worker`
-- GET `/gets`
-- DELETE `/delete/<key>`
-- DELETE `/clear/`
-- GET `/close/`
+| Master  | Worker |
+| ----    | ------ |
+| POST `/`               | POST `/worker/<worker_idx>` |
+| GET `/add_worker`      | GET `/get/<idx>`            |
+| GET `/gets`            | PUT `/put`                  |
+| DELETE `/delete/<key>` | DELETE `/delete/<key>`      |
+| DELETE `/clear`        | DELETE `/clear`             |
+| GET `/close`		 | GET `/close`		       |
 
-#### Worker
-- POST `/worker/<worker_idx>`
-- GET `/get/<idx>`
-- PUT `/put/<key>`
-- DELETE `/delete/<key>`
-- DELETE `/clear`
-- GET `/close`
+
 ### Usage
 ```
-curl -X POST localhost:3000						# runs the master server
-curl -X POST localhost:3001/worker/0					# runs the worker server on index 0
+curl -X POST localhost:3000						
+curl -X POST localhost:3001/worker/0					
 
-curl -X  PUT -d value="happy" localhost:3001/put/'A'			# should put 'happy' into 'A'
-curl -X  PUT file="~/Downlaods/cat.jpg"  localhost:3001/put/'B' 	# should put ~/Downloads/cat.jpg into 'B'
-curl --X localhost:3001/get/'A'						# should return 'happy'
-curl -X  DELETE localhost:3001/clear					# should clear all data left in worker
-curl -X  DELETE localhost:3000/clear					# clears all data from master server
-curl --X localhost:3001/close						# closes connection to worker
-curl --X localhost:3000/close						# closes connection to master
+# put 'happy' into 'A'
+curl -X  PUT -d value="happy" localhost:3001/put/'A'		
+
+# put '~/Downloads/cat,jpg' file into 'B'
+curl -X  PUT -d file="~/Downlaods/cat.jpg"  localhost:3001/put/'B' 	
+
+# get value stored for 'A'
+curl --X localhost:3001/get/'A'		
+
+# get metadata for master
+curl --X localhost:3001/gets				
+
+# clear all data in worker 3001
+curl -X  DELETE localhost:3001/clear					
+
+# clear all data in master server
+curl -X  DELETE localhost:3000/clear					
+
+# close all connection to worker on 3001
+curl --X localhost:3001/close		
+
+# close connection to master server		
+curl --X localhost:3000/close						
 ```
 **Note:** Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.
