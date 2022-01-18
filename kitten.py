@@ -4,10 +4,10 @@ from util import hashed_key
 import requests
 import json
 
-if os.environ['DOCKER']:
-    DOCKER = True
-else:
-    Docker = False
+try:
+    DOCKER=os.environ['DOCKER']
+except:
+    DOCKER=False
 class KittenFS():
     def __init__(self):
         self.worker = None
