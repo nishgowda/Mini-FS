@@ -4,6 +4,10 @@ from util import hashed_key
 import requests
 import json
 
+if os.environ['DOCKER']:
+    DOCKER = True
+else:
+    Docker = False
 class KittenFS():
     def __init__(self):
         self.worker = None
@@ -65,7 +69,6 @@ class KittenFS():
         return hashed_idx
 
     def put(self,key,val):
-        print("Self.worker is...", self.worker)
         hashed_k = str(hashed_key(key)).encode()
         self.worker.put(hashed_k, val.encode())
         self.content_idx +=1
@@ -81,8 +84,8 @@ class KittenFS():
         else:
             h_key = str(hashed_key(key)).encode() 
             self.worker.delete(h_key)
-        if is_testing == False:
-            requests.get(f'http://localhost:3000/delete/{h_key}')
+        if is_testing == False and DOCKER:
+            requests.get(f'http://master:3000/delete/{h_key}')
         return str(hashed_key(key)).encode()
 
     def delete_from_master(self, h_key):

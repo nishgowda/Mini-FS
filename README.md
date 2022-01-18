@@ -28,16 +28,20 @@ pip3 install -r requirements.txt
 **Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/. You can use the `mk.sh` script in the *tools* directory to automatically make this for you.
 
 ### Using Docker
-You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. There are severall command line flags you can use here to meet your needs. 
+You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. This is still in development so there are some bugs, particularyly when running multiple workers.
+
+ There are severall command line flags you can use here to meet your needs. 
 - You can control how many workers you want to spin up with `num_workers`
 - You can specify if you want to rebuild the images with `build`. This automates to 1, so the value you use here doesn't matter.
-- You can specify if you wan to create the docker-network with the `network` flag. This also automates to 1. 
+- You can specify if you wan to create the docker-network with the `network` flag. This also automates to 1.
+- You can specify if you want to remake the shared volumes from containers with the `volumes` flag.  
 ```
-./docker-setup.sh -num_workers 2 -build 1  # spins up 2 worker servers and builds the docker images.
+# spins up 2 worker servers and builds the docker images, while specifying to make volumes
+./docker-setup.sh -num_workers 2 -build 1  -volumes 1
 ```
-This builds *three* different containers, one MASTER and two WORKERS and creates a docker network between them that allows them to communicate with each other. The environment variables will already be setup and the ports will be starting from port 3001 and increase incrementally by 1 for each new worker you want to spin up (the master server starts at port 3000).
+This builds *three* different containers, one MASTER and two WORKERS and creates a docker network between them that allows them to communicate with each other. The environment variables will already be setup and the ports will be starting from port 3001 and increase incrementally by 1 for each new worker you want to spin up (the master server starts at port 3000). You need to run this with the network and volumes and build on your first run though.
 
-**Note:** You need to do this on your first run, otherwise it will not work.
+
 ## Start the servers
 **Note**: You can skip the following step if you've used the docker-setup shell script and move straight to setting up the master and worker servers.
 Use the bash script *main* to quickly spin up master and worker servers in the background. It's key that you create the master server before any workers.
