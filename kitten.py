@@ -84,7 +84,7 @@ class KittenFS():
         else:
             h_key = str(hashed_key(key)).encode() 
             self.worker.delete(h_key)
-        if is_testing == False
+        if is_testing == False:
             if DOCKER:
                 requests.get(f'http://master:3000/delete/{h_key}')
             else:
