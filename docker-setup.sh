@@ -48,11 +48,12 @@ fi
 
 # create volumes
 docker volume create --name mk
-
 # 3.) run master container now
-docker run -d -p 3000:3000 -e DOCKER=True -v mk:/tmp --net kitten --name master kittenfs:master
+docker run -d -p 3000:3000 -e DOCKER=True -v mk:/tmp/cachedb --net kitten --name master kittenfs:master
 
 if [ -z $VOLUMES ]; then
+  echo "Not re-creating volumes"
+else
   # 4.) create /tmp/cachedb on disk for leveldb storage
   docker exec master mkdir /tmp/cachedb
   docker exec master mkdir /tmp/cachedb/master
@@ -62,5 +63,5 @@ fi
 for i in $(seq 1 $num_workers);  do
   # for the number of workers, the port is incremented by 1 and we assign the same volumes
   # that we made for the master.
-      docker run -d -p "300$i":"300$i" -e PORT="300$i" -e DOCKER=True -e MASTER=3000  -v mk:/tmp --net kitten --name "worker_$i" kittenfs:worker 
+      docker run -d -p "300$i":"300$i" -e PORT="300$i" -e DOCKER=True -e MASTER=3000  -v mk:/tmp/cachedb/ --net kitten --name "worker_$i" kittenfs:worker 
 done

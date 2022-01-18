@@ -26,7 +26,7 @@ def create_worker(worker_idx):
     return jsonify(worker)
 @app.route('/clone/<prev>')
 def clone(prev): 
-    os.system(f'./clones.sh {prev} {worker_idx}')
+    os.system(f'./tools/clones.sh {prev} {worker_idx}')
     return json.dumps("Cloned")
 @app.route('/put/<key>', methods=['PUT'])
 def put_req(key):
