@@ -5,14 +5,20 @@
 
 [![Unit Tests](https://github.com/nishgowda/KittenFS/actions/workflows/tests.yml/badge.svg)](https://github.com/nishgowda/KittenFS/actions/workflows/tests.yml)
 
-An *actually* simple distributed key value store in python. All work is handled by leveldb and the servers are run by flask with gunicorn (to make it faster).
+An *actually* simple distributed key value store in python. 
 
-All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node adds metadata about the new worker whenever a new one is spun up on a different server. All worker indices are automatically incremented on creation and all keys put are hashed and indexed intentionally.
+- Data is stored on *disk*
+- Database conenctions are made with [leveldb](https://github.com/google/leveldb)
+- Servers are run by flask and sped up with gunicorn
+- Includes option to run on docker containers
+- All keys put are hashed and indexed
+
+All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node adds metadata about the new worker whenever a new one is spun up on a different server. All worker indices are automatically incremented on creation.
 
 ## Supported OS
 ```
-Most forms of Linux should be supported without errors.
-Mac may experience errors in installing leveldb. This is mostly a dependency issue only.
+Most forms of Linux should be supported out of the box.
+Mac may experience errors in installing leveldb, however, this is mostly a dependency issue only.
 Windows has not yet been tested.
 ```
 
@@ -27,8 +33,10 @@ pip3 install -r requirements.txt
 ```
 **Note:** With the way leveldb works, and depending on your system, you may need to manually create a *master* and a *worker* directory in /tmp/. You can use the `mk.sh` script in the *tools* directory to automatically make this for you.
 
-### Using Docker
-You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. This is still in development so there are some bugs, particularyly when running multiple workers.
+## Using Docker
+You can also run kittenFS on docker, so you don't need to worry about problems with installation or your OS at all. 
+
+Note that this is still in **development** so there are some bugs, particularly when running multiple worker instances.
 
  There are severall command line flags you can use here to meet your needs. 
 - You can control how many workers you want to spin up with `num_workers`
@@ -39,12 +47,13 @@ You can also run kittenFS on docker, so you don't need to worry about problems w
 # spins up 2 worker servers and builds the docker images, while specifying to make volumes
 ./docker-setup.sh -num_workers 2 -build 1  -volumes 1
 ```
-This builds *three* different containers, one MASTER and two WORKERS and creates a docker network between them that allows them to communicate with each other. The environment variables will already be setup and the ports will be starting from port 3001 and increase incrementally by 1 for each new worker you want to spin up (the master server starts at port 3000). You need to run this with the network and volumes and build on your first run though.
+Take a look at the ```docker-setup.sh``` script for a closer look at this process.
 
 
-## Start the servers
+## Starting the servers
 **Note**: You can skip the following step if you've used the docker-setup shell script and move straight to setting up the master and worker servers.
-Use the bash script *main* to quickly spin up master and worker servers in the background. It's key that you create the master server before any workers.
+
+Use the bash script ```main.sh``` to quickly spin up master and worker servers in the background. It's key that you create the master server before any workers.
 ```
 ./main.sh master 3000 			# spin up master on 3000
 MASTER=3000 ./main.sh worker 3001 	# spin up a worker on 3001; specifies master running on 3000
@@ -57,14 +66,11 @@ If you want to start the master and worker server on ports 3000 and 3001 respect
 ```
 
 ### Replicating workers
-You can also create a new worker that starts as a clone of another through the `clone` endpoint.
+You can also create a new worker that starts as a clone of another through the `clone` API endpoint.
 ```
 curl --X localhost:3002/clone/1
 ```
 This allows the new worker on 3002 to copy the contents of the worker with index 1.
-
-- Then you can make requests to the worker server by requesting put and get requests.
-- For each new worker you make, the master server will add metadata about it.
 
 ## API
 | Master  | Worker |
@@ -109,3 +115,12 @@ curl --X localhost:3001/close
 curl --X localhost:3000/close						
 ```
 **Note:** Also curl the *clear* url for a worker when finished to clear the  worker server so you can keep runnning the tests without overlapping the data.
+
+## TODO:
+- Fix docker bugs
+- Add support for rebalancing
+- Add caching support for files
+- Create tests for Windows operating system
+
+## Contributing
+Any contributions are more than welcome! Just leave a pull request and if it passes tests and checks out we can merge. Ideas to start off with can be found in implementing one of the items in the TODO list.
