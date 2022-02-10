@@ -1,17 +1,14 @@
 # kittenFS
-<p align="center">
-<img src="cat.jpg" alt="cat" width="600"/>
-</p>
 
 [![Unit Tests](https://github.com/nishgowda/KittenFS/actions/workflows/tests.yml/badge.svg)](https://github.com/nishgowda/KittenFS/actions/workflows/tests.yml)
 
-An *actually* simple distributed key value store in python. 
+An *actually* simple distributed key value store in python. (This is to learn distributed file systems)
 
 - Data is stored on *disk*
 - Database conenctions are made with [leveldb](https://github.com/google/leveldb)
 - Servers are run by flask and sped up with gunicorn
 - Includes option to run on docker containers
-- All keys put are hashed and indexed
+- All keys put are *hashed* when indexed
 
 All work is handled by worker nodes and a master server is created that will hold metadata about each worker node that is created. The master node adds metadata about the new worker whenever a new one is spun up on a different server. All worker indices are automatically incremented on creation.
 

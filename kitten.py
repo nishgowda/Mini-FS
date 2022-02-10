@@ -4,10 +4,13 @@ from util import hashed_key
 import requests
 import json
 
+# this is testing for docker
+# changes the request url we make in delete
 try:
     DOCKER=os.environ['DOCKER']
 except:
     DOCKER=False
+
 class KittenFS():
     def __init__(self):
         self.worker = None
@@ -21,8 +24,11 @@ class KittenFS():
     def set_worker_idx(self, idx):
         self.worker_idx = idx
 
+    # leveldb is stored in /tmp
+    # creates a master and a workery directory
+    # with subdirs for each worker
     def create_master(self):
-        self.master = plyvel.DB('/tmp/cachedb/master', create_if_missing=True)
+        self.master = plyvel.DB('/tmp/kittenfs/master', create_if_missing=True)
         return self.master
     
     def k_in_master(self, idx):
@@ -56,7 +62,7 @@ class KittenFS():
 
     # call this after we reach a certain amount of data hit
     def add_worker(self):
-        path = f'/tmp/cachedb/worker/{self.worker_idx}'
+        path = f'/tmp/kittenfs/worker/{self.worker_idx}'
         db = plyvel.DB(path, create_if_missing=True)
         self.worker = db
         print("self.worker is", self.worker)
@@ -88,6 +94,7 @@ class KittenFS():
             if DOCKER:
                 requests.get(f'http://master:3000/delete/{h_key}')
             else:
+                # for tesing..you should switch this in produciton
                 requests.get(f'http://localhost:3000/delete/{h_key}')
         return str(hashed_key(key)).encode()
 
